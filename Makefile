@@ -2,7 +2,7 @@ COMPOSE_DIR := infrastructure
 COMPOSE := docker compose -f $(COMPOSE_DIR)/docker-compose.yml
 COMPOSE_DEV := $(COMPOSE) -f $(COMPOSE_DIR)/docker-compose.dev.yml
 
-.PHONY: up down dev dev-down logs build reset clean test
+.PHONY: up down dev dev-down logs build reset clean test verify-auth verify
 
 ## Start all services (production-like)
 up:
@@ -38,3 +38,9 @@ clean:
 
 test:
 	pnpm --filter @shire/auth-service test
+
+verify: clean up test verify-auth
+
+## Run auth-service verification against a live stack (make reset && make up first)
+verify-auth:
+	./scripts/verify-auth.sh
