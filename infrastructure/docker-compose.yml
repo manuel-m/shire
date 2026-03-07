@@ -1,0 +1,108 @@
+services:
+  # ── Application Services ──────────────────────────────────────────
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: services/auth-service/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - AUTH_SERVICE_PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/shire-auth
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRES_IN=15m
+      - REFRESH_TOKEN_EXPIRES_IN_DAYS=7
+      - BCRYPT_ROUNDS=12
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "auth-service"
+
+  # ── Database ───────────────────────────────────────────────────────
+
+  mongodb:
+    image: mongo:7
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - shire-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Observability ──────────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+    networks:
+      - shire-network
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:3.1.0
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - shire-network
+    restart: unless-stopped
+
+  alloy:
+    image: grafana/alloy:v1.3.0
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: run /etc/alloy/config.alloy
+    depends_on:
+      - loki
+    networks:
+      - shire-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3100:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - shire-network
+    restart: unless-stopped
+
+networks:
+  shire-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:
