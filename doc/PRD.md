@@ -138,6 +138,12 @@ Manage contacts associated with a client:
 * email
 * phone
 
+Store code credentials associated with a client:
+
+* `codeCredentials` — encrypted storage for repository credentials, SSH keys, and access tokens
+
+**Security:** All code credentials must be encrypted at rest. Access to credentials must be logged for audit purposes.
+
 ### Key Actions
 
 Create client
@@ -155,11 +161,16 @@ Each engagement must contain:
 
 * client
 * engagement type
+* `accessType` — defines how the consultant accesses the client's system:
+  * `black-box` — web URL only, no code access
+  * `code-delivery` — client provides code archive or snapshot
+  * `code-credentials` — consultant receives repository credentials for direct access
 * description
 * priority
 * status
 * assigned consultant
 * timeline
+* `creationDate` — immutable timestamp set at engagement creation
 
 ### Engagement Types
 
@@ -281,6 +292,7 @@ Number of diagnostics completed
 Revenue (monthly)
 Revenue (total)
 Outstanding invoices
+Monthly activity (engagement status changes + reports created + invoices issued in the current month)
 
 ---
 
@@ -315,6 +327,7 @@ The platform uses a microservices architecture with containerized services.
 Core components:
 
 API Gateway
+Auth Service (JWT authentication, user management, token issuance and validation)
 Client Service
 Engagement Service
 Report Service
@@ -355,6 +368,24 @@ Unit testing
 Integration testing
 API contract testing
 
+### Shared Types
+
+`packages/shared-types/` — TypeScript interfaces and Zod schemas shared across all services, imported as `@shire/shared-types`.
+
+### Repository Structure
+
+Monorepo managed with pnpm workspaces.
+
+### CI/CD Pipeline
+
+* Lint, type-check, and test on every pull request
+* Docker image build on merge
+* Staging deployment on merge to main
+
+### Environment Configuration
+
+Three environments: development, staging, production — configured via environment variables.
+
 ---
 
 # 9. Data Storage
@@ -391,6 +422,17 @@ Database operations
 ### Contract Tests
 
 API communication between services.
+
+### Test Framework
+
+Vitest (preferred) or Jest.
+
+### Coverage Targets
+
+* 80% coverage on service logic
+* 100% coverage on API endpoints
+* 100% coverage on Zod schemas
+* Contract tests for all inter-service calls
 
 ---
 
