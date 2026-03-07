@@ -395,9 +395,7 @@ describe('Credentials', () => {
       .put(`/clients/${clientId}/credentials`)
       .set('Authorization', `Bearer ${token}`)
       .send(creds);
-    await request
-      .get(`/clients/${clientId}/credentials`)
-      .set('Authorization', `Bearer ${token}`);
+    await request.get(`/clients/${clientId}/credentials`).set('Authorization', `Bearer ${token}`);
 
     const db = getDb();
     const logs = await db.collection('credential_access_logs').find({ clientId }).toArray();

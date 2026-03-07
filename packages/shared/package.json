@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "lint": "echo 'no linter configured yet'"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@shire/shared-types": "workspace:*",

@@ -61,7 +61,9 @@ describe('POST /auth/login', () => {
   });
 
   it('should login with valid credentials', async () => {
-    const res = await request.post('/auth/login').send({ email: testUser.email, password: testUser.password });
+    const res = await request
+      .post('/auth/login')
+      .send({ email: testUser.email, password: testUser.password });
     expect(res.status).toBe(200);
     expect(res.body.accessToken).toBeDefined();
     expect(res.body.refreshToken).toBeDefined();
@@ -69,13 +71,17 @@ describe('POST /auth/login', () => {
   });
 
   it('should return 401 for wrong password', async () => {
-    const res = await request.post('/auth/login').send({ email: testUser.email, password: 'wrong' });
+    const res = await request
+      .post('/auth/login')
+      .send({ email: testUser.email, password: 'wrong' });
     expect(res.status).toBe(401);
     expect(res.body.error.code).toBe('INVALID_CREDENTIALS');
   });
 
   it('should return 401 for non-existent email', async () => {
-    const res = await request.post('/auth/login').send({ email: 'no@example.com', password: 'test' });
+    const res = await request
+      .post('/auth/login')
+      .send({ email: 'no@example.com', password: 'test' });
     expect(res.status).toBe(401);
   });
 });
@@ -182,7 +188,9 @@ describe('Refresh token limit', () => {
 
     // Generate 5 more login sessions (total 6 refresh tokens issued)
     for (let i = 0; i < 5; i++) {
-      await request.post('/auth/login').send({ email: testUser.email, password: testUser.password });
+      await request
+        .post('/auth/login')
+        .send({ email: testUser.email, password: testUser.password });
     }
 
     // The first token should have been evicted

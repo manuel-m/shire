@@ -8,6 +8,10 @@ import {
 } from '@shire/shared-types';
 import { registry } from '../openapi/registry.js';
 
+const MIME_JSON = 'application/json';
+const VALIDATION_ERROR_DESC = 'Validation error';
+const CLIENT_NOT_FOUND_DESC = 'Client not found';
+const CLIENT_BY_ID_PATH = '/clients/{id}';
 const security = [{ BearerAuth: [] }];
 
 registry.registerPath({
@@ -17,21 +21,21 @@ registry.registerPath({
   security,
   request: {
     body: {
-      content: { 'application/json': { schema: CreateClientSchema } },
+      content: { [MIME_JSON]: { schema: CreateClientSchema } },
     },
   },
   responses: {
     201: {
       description: 'Client created',
-      content: { 'application/json': { schema: ClientSchema } },
+      content: { [MIME_JSON]: { schema: ClientSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     409: {
       description: 'Duplicate company name',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -48,7 +52,7 @@ registry.registerPath({
     200: {
       description: 'Paginated list of clients',
       content: {
-        'application/json': {
+        [MIME_JSON]: {
           schema: z.object({
             data: z.array(ClientSchema),
             total: z.number(),
@@ -59,15 +63,15 @@ registry.registerPath({
       },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
 
 registry.registerPath({
   method: 'get',
-  path: '/clients/{id}',
+  path: CLIENT_BY_ID_PATH,
   summary: 'Get a client by ID',
   security,
   request: {
@@ -76,49 +80,49 @@ registry.registerPath({
   responses: {
     200: {
       description: 'Client found',
-      content: { 'application/json': { schema: ClientSchema } },
+      content: { [MIME_JSON]: { schema: ClientSchema } },
     },
     404: {
-      description: 'Client not found',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: CLIENT_NOT_FOUND_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
 
 registry.registerPath({
   method: 'put',
-  path: '/clients/{id}',
+  path: CLIENT_BY_ID_PATH,
   summary: 'Update a client',
   security,
   request: {
     params: z.object({ id: z.string() }),
     body: {
-      content: { 'application/json': { schema: UpdateClientSchema } },
+      content: { [MIME_JSON]: { schema: UpdateClientSchema } },
     },
   },
   responses: {
     200: {
       description: 'Client updated',
-      content: { 'application/json': { schema: ClientSchema } },
+      content: { [MIME_JSON]: { schema: ClientSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     404: {
-      description: 'Client not found',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: CLIENT_NOT_FOUND_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     409: {
       description: 'Duplicate company name',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
 
 registry.registerPath({
   method: 'delete',
-  path: '/clients/{id}',
+  path: CLIENT_BY_ID_PATH,
   summary: 'Delete a client',
   security,
   request: {
@@ -129,12 +133,12 @@ registry.registerPath({
       description: 'Client deleted',
     },
     404: {
-      description: 'Client not found',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: CLIENT_NOT_FOUND_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     409: {
       description: 'Client has active engagements',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });

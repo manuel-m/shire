@@ -10,6 +10,7 @@ export function validateBody(schema: z.ZodTypeAny) {
       });
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     req.body = result.data;
     next();
   };
@@ -24,6 +25,7 @@ export function validateQuery(schema: z.ZodTypeAny) {
       });
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     req.query = result.data;
     next();
   };

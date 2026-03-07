@@ -26,7 +26,7 @@ export function decrypt(encoded: string): string {
   const ciphertext = Buffer.from(ciphertextB64, 'base64');
   const decipher = createDecipheriv('aes-256-gcm', key, iv);
   decipher.setAuthTag(authTag);
-  return decipher.update(ciphertext) + decipher.final('utf8');
+  return decipher.update(ciphertext).toString('utf8') + decipher.final('utf8');
 }
 
 export function encryptArray(arr: string[]): string[] {

@@ -19,7 +19,9 @@ export function createAuthMiddleware(jwtSecret: string) {
   function requireAuth(req: Request, res: Response, next: NextFunction): void {
     const header = req.headers.authorization;
     if (!header || !header.startsWith('Bearer ')) {
-      res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Missing or invalid authorization header' } });
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Missing or invalid authorization header' },
+      });
       return;
     }
 
@@ -29,7 +31,9 @@ export function createAuthMiddleware(jwtSecret: string) {
       req.user = payload;
       next();
     } catch {
-      res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Invalid or expired token' } });
+      res
+        .status(401)
+        .json({ error: { code: 'UNAUTHORIZED', message: 'Invalid or expired token' } });
     }
   }
 

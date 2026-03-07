@@ -10,13 +10,17 @@ import {
 } from '@shire/shared-types';
 import { registry } from '../openapi/registry.js';
 
+const MIME_JSON = 'application/json';
+const VALIDATION_ERROR_DESC = 'Validation error';
 const security = [{ BearerAuth: [] }];
 
-const AuthResponseSchema = z.object({
-  user: UserPublicSchema,
-  accessToken: z.string(),
-  refreshToken: z.string(),
-}).openapi('AuthResponse');
+const AuthResponseSchema = z
+  .object({
+    user: UserPublicSchema,
+    accessToken: z.string(),
+    refreshToken: z.string(),
+  })
+  .openapi('AuthResponse');
 
 registry.registerPath({
   method: 'post',
@@ -24,21 +28,21 @@ registry.registerPath({
   summary: 'Register a new user',
   request: {
     body: {
-      content: { 'application/json': { schema: CreateUserSchema } },
+      content: { [MIME_JSON]: { schema: CreateUserSchema } },
     },
   },
   responses: {
     201: {
       description: 'User registered',
-      content: { 'application/json': { schema: AuthResponseSchema } },
+      content: { [MIME_JSON]: { schema: AuthResponseSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     409: {
       description: 'Email already registered',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -49,21 +53,21 @@ registry.registerPath({
   summary: 'Log in with email and password',
   request: {
     body: {
-      content: { 'application/json': { schema: LoginSchema } },
+      content: { [MIME_JSON]: { schema: LoginSchema } },
     },
   },
   responses: {
     200: {
       description: 'Login successful',
-      content: { 'application/json': { schema: AuthResponseSchema } },
+      content: { [MIME_JSON]: { schema: AuthResponseSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     401: {
       description: 'Invalid credentials',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -74,21 +78,21 @@ registry.registerPath({
   summary: 'Refresh access token',
   request: {
     body: {
-      content: { 'application/json': { schema: RefreshRequestSchema } },
+      content: { [MIME_JSON]: { schema: RefreshRequestSchema } },
     },
   },
   responses: {
     200: {
       description: 'Tokens refreshed',
-      content: { 'application/json': { schema: AuthTokensSchema } },
+      content: { [MIME_JSON]: { schema: AuthTokensSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     401: {
       description: 'Invalid or expired refresh token',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -100,21 +104,21 @@ registry.registerPath({
   security,
   request: {
     body: {
-      content: { 'application/json': { schema: RefreshRequestSchema } },
+      content: { [MIME_JSON]: { schema: RefreshRequestSchema } },
     },
   },
   responses: {
     200: {
       description: 'Logged out',
       content: {
-        'application/json': {
+        [MIME_JSON]: {
           schema: z.object({ message: z.string() }),
         },
       },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -127,11 +131,11 @@ registry.registerPath({
   responses: {
     200: {
       description: 'Current user',
-      content: { 'application/json': { schema: UserPublicSchema } },
+      content: { [MIME_JSON]: { schema: UserPublicSchema } },
     },
     404: {
       description: 'User not found',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });
@@ -143,25 +147,25 @@ registry.registerPath({
   security,
   request: {
     body: {
-      content: { 'application/json': { schema: UpdateUserSchema } },
+      content: { [MIME_JSON]: { schema: UpdateUserSchema } },
     },
   },
   responses: {
     200: {
       description: 'User updated',
-      content: { 'application/json': { schema: UserPublicSchema } },
+      content: { [MIME_JSON]: { schema: UserPublicSchema } },
     },
     400: {
-      description: 'Validation error',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      description: VALIDATION_ERROR_DESC,
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     404: {
       description: 'User not found',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
     409: {
       description: 'Email already in use',
-      content: { 'application/json': { schema: ErrorResponseSchema } },
+      content: { [MIME_JSON]: { schema: ErrorResponseSchema } },
     },
   },
 });

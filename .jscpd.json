@@ -1,0 +1,8 @@
+{
+  "pattern": ["packages/*/src/**/*.ts", "services/*/src/**/*.ts"],
+  "ignore": ["**/*.test.ts", "**/dist/**", "**/node_modules/**"],
+  "minLines": 5,
+  "minTokens": 50,
+  "threshold": 5,
+  "reporters": ["console"]
+}

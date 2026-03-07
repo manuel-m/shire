@@ -7,7 +7,14 @@
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "test:unit": "pnpm -r test:unit",
-    "test:integration": "pnpm -r test:integration"
+    "test:integration": "pnpm -r test:integration",
+    "format": "prettier --write 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts'",
+    "format:check": "prettier --check 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts'",
+    "duplication": "jscpd",
+    "depcheck": "bash scripts/depcheck.sh",
+    "security": "bash scripts/semgrep.sh",
+    "validate": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication && pnpm run depcheck",
+    "prepare": "husky || true"
   },
   "engines": {
     "node": ">=20"
@@ -18,5 +25,16 @@
       "esbuild",
       "mongodb-memory-server"
     ]
+  },
+  "devDependencies": {
+    "depcheck": "^1.4.7",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-sonarjs": "^4.0.1",
+    "husky": "^9.1.7",
+    "jscpd": "^4.0.8",
+    "lint-staged": "^16.3.2",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.56.1"
   }
 }

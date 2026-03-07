@@ -15,6 +15,9 @@ import { createAuthMiddleware, createLogger, type AuthPayload } from '@shire/sha
 const { requireAuth } = createAuthMiddleware(config.jwtSecret);
 const { log } = createLogger(config.serviceName);
 
+const INVALID_REFRESH_TOKEN = 'INVALID_REFRESH_TOKEN';
+const USER_NOT_FOUND = 'User not found';
+
 export const authRouter = Router();
 
 function generateAccessToken(user: { _id: string; email: string; role: string }): string {
@@ -86,7 +89,14 @@ authRouter.post('/register', async (req: Request, res: Response) => {
   const refreshToken = await generateRefreshToken(user._id);
 
   res.status(201).json({
-    user: { _id: user._id, email: user.email, name: user.name, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt },
+    user: {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
     accessToken,
     refreshToken,
   });
@@ -105,13 +115,17 @@ authRouter.post('/login', async (req: Request, res: Response) => {
 
   const user = await users.findOne({ email });
   if (!user) {
-    res.status(401).json({ error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } });
+    res
+      .status(401)
+      .json({ error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } });
     return;
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    res.status(401).json({ error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } });
+    res
+      .status(401)
+      .json({ error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } });
     return;
   }
 
@@ -121,7 +135,14 @@ authRouter.post('/login', async (req: Request, res: Response) => {
   const refreshToken = await generateRefreshToken(user._id);
 
   res.json({
-    user: { _id: user._id, email: user.email, name: user.name, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt },
+    user: {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
     accessToken,
     refreshToken,
   });
@@ -141,7 +162,9 @@ authRouter.post('/refresh', async (req: Request, res: Response) => {
   const stored = await refreshTokens.findOne({ token: refreshToken });
   if (!stored || stored.expiresAt < new Date()) {
     if (stored) await refreshTokens.deleteOne({ _id: stored._id });
-    res.status(401).json({ error: { code: 'INVALID_REFRESH_TOKEN', message: 'Invalid or expired refresh token' } });
+    res.status(401).json({
+      error: { code: INVALID_REFRESH_TOKEN, message: 'Invalid or expired refresh token' },
+    });
     return;
   }
 
@@ -149,7 +172,7 @@ authRouter.post('/refresh', async (req: Request, res: Response) => {
   const user = await users.findOne({ _id: stored.userId });
   if (!user) {
     await refreshTokens.deleteOne({ _id: stored._id });
-    res.status(401).json({ error: { code: 'INVALID_REFRESH_TOKEN', message: 'User not found' } });
+    res.status(401).json({ error: { code: INVALID_REFRESH_TOKEN, message: USER_NOT_FOUND } });
     return;
   }
 
@@ -181,7 +204,7 @@ authRouter.get('/me', requireAuth, async (req: Request, res: Response) => {
   const users = getUsersCollection();
   const user = await users.findOne({ _id: req.user!.userId });
   if (!user) {
-    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } });
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: USER_NOT_FOUND } });
     return;
   }
 
@@ -200,7 +223,10 @@ authRouter.put('/me', requireAuth, async (req: Request, res: Response) => {
   const users = getUsersCollection();
 
   if (parsed.data.email) {
-    const existing = await users.findOne({ email: parsed.data.email, _id: { $ne: req.user!.userId } });
+    const existing = await users.findOne({
+      email: parsed.data.email,
+      _id: { $ne: req.user!.userId },
+    });
     if (existing) {
       res.status(409).json({ error: { code: 'EMAIL_EXISTS', message: 'Email already in use' } });
       return;
@@ -214,7 +240,7 @@ authRouter.put('/me', requireAuth, async (req: Request, res: Response) => {
   );
 
   if (!result) {
-    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } });
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: USER_NOT_FOUND } });
     return;
   }
 

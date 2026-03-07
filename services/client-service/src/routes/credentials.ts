@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { CodeCredentialsInputSchema } from '@shire/shared-types';
 import { getClientsCollection, getCredentialAccessLogsCollection } from '../db.js';
 import { createAuthMiddleware, createLogger } from '@shire/shared';
-import { encrypt, decrypt, encryptArray, decryptArray } from '../crypto.js';
+import { encryptArray, decryptArray } from '../crypto.js';
 import { config } from '../config.js';
 
 const { requireAuth } = createAuthMiddleware(config.jwtSecret);
@@ -49,7 +49,11 @@ credentialsRouter.put('/', async (req: Request, res: Response) => {
     timestamp: new Date(),
   });
 
-  log('info', 'Credentials updated', { clientId: clientId, userId: req.user!.userId, requestId: req.requestId });
+  log('info', 'Credentials updated', {
+    clientId: clientId,
+    userId: req.user!.userId,
+    requestId: req.requestId,
+  });
   res.json({ message: 'Credentials updated' });
 });
 
@@ -79,6 +83,10 @@ credentialsRouter.get('/', async (req: Request, res: Response) => {
     timestamp: new Date(),
   });
 
-  log('info', 'Credentials accessed', { clientId: clientId, userId: req.user!.userId, requestId: req.requestId });
+  log('info', 'Credentials accessed', {
+    clientId: clientId,
+    userId: req.user!.userId,
+    requestId: req.requestId,
+  });
   res.json(decrypted);
 });

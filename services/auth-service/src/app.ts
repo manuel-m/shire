@@ -20,7 +20,8 @@ export function createApp(): express.Application {
   app.use((req, res, next) => {
     const end = httpRequestDuration.startTimer();
     res.on('finish', () => {
-      const route = req.route?.path || req.path;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const route: string = req.route?.path || req.path;
       const labels = { method: req.method, route, status_code: res.statusCode.toString() };
       end(labels);
       httpRequestTotal.inc(labels);
