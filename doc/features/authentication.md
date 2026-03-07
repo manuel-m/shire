@@ -86,6 +86,113 @@ const RefreshTokenSchema = z.object({
 
 ---
 
+## How to Verify
+
+### Prerequisites
+
+1. Start MongoDB (or the service will use `MONGODB_URI` from env):
+   ```bash
+   docker run -d -p 27017:27017 --name shire-mongo mongo:7
+   ```
+2. Install dependencies and build shared types:
+   ```bash
+   pnpm install
+   pnpm --filter @shire/shared-types build
+   ```
+
+### Run automated tests
+
+```bash
+pnpm --filter @shire/auth-service test
+```
+
+This runs integration tests against an in-memory MongoDB (no external DB needed). All acceptance criteria are covered by the test suite.
+
+### Manual verification with curl
+
+1. Start the auth service:
+   ```bash
+   pnpm --filter @shire/auth-service dev
+   ```
+
+2. **Register** a new user:
+   ```bash
+   curl -s -X POST http://localhost:3001/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
+   ```
+   Expected: `201` with `user`, `accessToken`, `refreshToken`.
+
+3. **Register duplicate** (same email):
+   ```bash
+   curl -s -X POST http://localhost:3001/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
+   ```
+   Expected: `409` with `EMAIL_EXISTS`.
+
+4. **Login**:
+   ```bash
+   curl -s -X POST http://localhost:3001/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"password123"}'
+   ```
+   Expected: `200` with `user`, `accessToken`, `refreshToken`. Save the tokens.
+
+5. **Get profile** (replace `<accessToken>`):
+   ```bash
+   curl -s http://localhost:3001/auth/me \
+     -H "Authorization: Bearer <accessToken>"
+   ```
+   Expected: `200` with user profile (no `passwordHash`).
+
+6. **Update profile**:
+   ```bash
+   curl -s -X PUT http://localhost:3001/auth/me \
+     -H "Authorization: Bearer <accessToken>" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Updated Name"}'
+   ```
+   Expected: `200` with updated profile.
+
+7. **Refresh token** (replace `<refreshToken>`):
+   ```bash
+   curl -s -X POST http://localhost:3001/auth/refresh \
+     -H "Content-Type: application/json" \
+     -d '{"refreshToken":"<refreshToken>"}'
+   ```
+   Expected: `200` with new `accessToken` and `refreshToken`. Old refresh token is rotated.
+
+8. **Logout** (replace both tokens):
+   ```bash
+   curl -s -X POST http://localhost:3001/auth/logout \
+     -H "Authorization: Bearer <accessToken>" \
+     -H "Content-Type: application/json" \
+     -d '{"refreshToken":"<refreshToken>"}'
+   ```
+   Expected: `200`. Subsequent refresh with the same token returns `401`.
+
+9. **Verify expired/invalid token**:
+   ```bash
+   curl -s http://localhost:3001/auth/me \
+     -H "Authorization: Bearer invalid-token"
+   ```
+   Expected: `401` with `UNAUTHORIZED`.
+
+10. **Health check**:
+    ```bash
+    curl -s http://localhost:3001/health
+    ```
+    Expected: `{"status":"ok","service":"auth-service"}`.
+
+11. **Metrics endpoint**:
+    ```bash
+    curl -s http://localhost:3001/metrics
+    ```
+    Expected: Prometheus-format metrics output.
+
+---
+
 ## Dependencies
 
 - **None** — Auth Service is standalone
