@@ -42,11 +42,12 @@ TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT
 
 RESULT_COUNT=0
-for attempt in $(seq 1 15); do
+MAX_TRIES=50
+for attempt in $(seq 1 $MAX_TRIES); do
   NOW=$(date +%s)
   START=$((NOW - 3600))
-  curl -s "$LOKI_URL/loki/api/v1/query_range" \
-    --data-urlencode "query={container=~\".+auth.+\"}" \
+  curl -sG "$LOKI_URL/loki/api/v1/query_range" \
+    --data-urlencode "query={container=~\".*auth.*\"}" \
     --data-urlencode "start=${START}" \
     --data-urlencode "end=${NOW}" \
     --data-urlencode "limit=50" \
@@ -61,7 +62,7 @@ print(sum(len(s.get('values', [])) for s in streams))
 " 2>/dev/null || echo "0")
 
   if [ "$RESULT_COUNT" -gt 0 ]; then break; fi
-  echo "   waiting for log ingestion ... ($attempt/15)"
+  echo "   waiting for log ingestion ... ($attempt/$MAX_TRIES)"
   sleep 2
 done
 
