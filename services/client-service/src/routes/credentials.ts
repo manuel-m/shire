@@ -2,9 +2,12 @@ import { Router, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { CodeCredentialsInputSchema } from '@shire/shared-types';
 import { getClientsCollection, getCredentialAccessLogsCollection } from '../db.js';
-import { requireAuth } from '../middleware/auth.js';
+import { createAuthMiddleware, createLogger } from '@shire/shared';
 import { encrypt, decrypt, encryptArray, decryptArray } from '../crypto.js';
-import { log } from '../logger.js';
+import { config } from '../config.js';
+
+const { requireAuth } = createAuthMiddleware(config.jwtSecret);
+const { log } = createLogger(config.serviceName);
 
 export const credentialsRouter = Router({ mergeParams: true });
 

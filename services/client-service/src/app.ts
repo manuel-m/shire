@@ -1,14 +1,21 @@
 import express from 'express';
-import { healthRouter } from './routes/health.js';
+import { requestId, createHealthRouter, createMetrics, mountSwagger } from '@shire/shared';
 import { clientsRouter } from './routes/clients.js';
 import { contactsRouter } from './routes/contacts.js';
 import { credentialsRouter } from './routes/credentials.js';
-import { metricsRouter, httpRequestDuration, httpRequestTotal } from './metrics.js';
-import { requestId } from './middleware/request-id.js';
-import { mountSwagger } from './openapi/swagger.js';
+import { config } from './config.js';
+import { registry } from './openapi/registry.js';
+
+// Side-effect imports — register all OpenAPI paths
+import './routes/health.openapi.js';
+import './routes/clients.openapi.js';
+import './routes/contacts.openapi.js';
+import './routes/credentials.openapi.js';
 
 export function createApp(): express.Application {
   const app = express();
+  const { metricsRouter, httpRequestDuration, httpRequestTotal } = createMetrics();
+  const healthRouter = createHealthRouter(config.serviceName);
 
   app.use(express.json());
   app.use(requestId);
@@ -31,7 +38,11 @@ export function createApp(): express.Application {
   app.use('/clients/:id/contacts', contactsRouter);
   app.use('/clients/:id/credentials', credentialsRouter);
 
-  mountSwagger(app);
+  mountSwagger(app, registry, {
+    title: 'Shire Client Service',
+    version: '0.1.0',
+    description: 'Manages clients, contacts, and code credentials',
+  });
 
   return app;
 }

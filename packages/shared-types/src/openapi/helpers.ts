@@ -2,6 +2,8 @@ import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi';
+
+export type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import type { OpenAPIObject } from 'openapi3-ts/oas30';
 
 export function createServiceRegistry(): OpenAPIRegistry {

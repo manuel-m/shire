@@ -8,6 +8,40 @@ importers:
 
   .: {}
 
+  packages/shared:
+    dependencies:
+      '@shire/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+      jsonwebtoken:
+        specifier: ^9.0.0
+        version: 9.0.3
+      prom-client:
+        specifier: ^15.1.0
+        version: 15.1.3
+      swagger-ui-express:
+        specifier: ^5.0.1
+        version: 5.0.1(express@5.2.1)
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/express-serve-static-core':
+        specifier: ^5.1.1
+        version: 5.1.1
+      '@types/jsonwebtoken':
+        specifier: ^9.0.0
+        version: 9.0.10
+      '@types/swagger-ui-express':
+        specifier: ^4.1.8
+        version: 4.1.8
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
   packages/shared-types:
     dependencies:
       '@asteasolutions/zod-to-openapi':
@@ -32,6 +66,9 @@ importers:
       '@asteasolutions/zod-to-openapi':
         specifier: 7.3.4
         version: 7.3.4(zod@3.25.76)
+      '@shire/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@shire/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
@@ -50,12 +87,6 @@ importers:
       ms:
         specifier: ^2.1.3
         version: 2.1.3
-      prom-client:
-        specifier: ^15.1.0
-        version: 15.1.3
-      swagger-ui-express:
-        specifier: ^5.0.1
-        version: 5.0.1(express@5.2.1)
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -78,9 +109,6 @@ importers:
       '@types/supertest':
         specifier: ^6.0.0
         version: 6.0.3
-      '@types/swagger-ui-express':
-        specifier: ^4.1.8
-        version: 4.1.8
       mongodb-memory-server:
         specifier: ^10.4.0
         version: 10.4.3
@@ -102,24 +130,18 @@ importers:
       '@asteasolutions/zod-to-openapi':
         specifier: 7.3.4
         version: 7.3.4(zod@3.25.76)
+      '@shire/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@shire/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
       express:
         specifier: ^5.1.0
         version: 5.2.1
-      jsonwebtoken:
-        specifier: ^9.0.0
-        version: 9.0.3
       mongodb:
         specifier: ^6.12.0
         version: 6.21.0
-      prom-client:
-        specifier: ^15.1.0
-        version: 15.1.3
-      swagger-ui-express:
-        specifier: ^5.0.1
-        version: 5.0.1(express@5.2.1)
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -136,9 +158,9 @@ importers:
       '@types/supertest':
         specifier: ^6.0.0
         version: 6.0.3
-      '@types/swagger-ui-express':
-        specifier: ^4.1.8
-        version: 4.1.8
+      jsonwebtoken:
+        specifier: ^9.0.0
+        version: 9.0.3
       mongodb-memory-server:
         specifier: ^10.4.0
         version: 10.4.3

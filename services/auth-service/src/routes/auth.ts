@@ -10,8 +10,10 @@ import {
 } from '@shire/shared-types';
 import { getUsersCollection, getRefreshTokensCollection } from '../db.js';
 import { config } from '../config.js';
-import { requireAuth, type AuthPayload } from '../middleware/auth.js';
-import { log } from '../logger.js';
+import { createAuthMiddleware, createLogger, type AuthPayload } from '@shire/shared';
+
+const { requireAuth } = createAuthMiddleware(config.jwtSecret);
+const { log } = createLogger(config.serviceName);
 
 export const authRouter = Router();
 

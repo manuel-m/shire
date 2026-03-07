@@ -1,0 +1,33 @@
+{
+  "name": "@shire/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "echo 'no linter configured yet'"
+  },
+  "dependencies": {
+    "@shire/shared-types": "workspace:*",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "prom-client": "^15.1.0",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/express-serve-static-core": "^5.1.1",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "typescript": "^5.7.0"
+  }
+}

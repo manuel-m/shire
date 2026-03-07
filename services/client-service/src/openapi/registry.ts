@@ -1,5 +1,3 @@
-import { createServiceRegistry, bearerAuth } from '@shire/shared-types';
+import { createRegistry } from '@shire/shared';
 
-export const registry = createServiceRegistry();
-
-registry.registerComponent('securitySchemes', 'BearerAuth', bearerAuth);
+export const registry = createRegistry();

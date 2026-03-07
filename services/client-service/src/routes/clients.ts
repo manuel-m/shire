@@ -6,8 +6,11 @@ import {
   ClientFilterQuerySchema,
 } from '@shire/shared-types';
 import { getClientsCollection, getContactsCollection } from '../db.js';
-import { requireAuth } from '../middleware/auth.js';
-import { log } from '../logger.js';
+import { createAuthMiddleware, createLogger } from '@shire/shared';
+import { config } from '../config.js';
+
+const { requireAuth } = createAuthMiddleware(config.jwtSecret);
+const { log } = createLogger(config.serviceName);
 import * as engagementCheck from '../engagement-check.js';
 
 export const clientsRouter = Router();

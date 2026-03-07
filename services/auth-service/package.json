@@ -16,14 +16,13 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "7.3.4",
+    "@shire/shared": "workspace:*",
     "@shire/shared-types": "workspace:*",
     "bcrypt": "^6.0.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^6.12.0",
     "ms": "^2.1.3",
-    "prom-client": "^15.1.0",
-    "swagger-ui-express": "^5.0.1",
     "zod": "^3.24.0"
   },
   "devDependencies": {
@@ -33,7 +32,6 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/ms": "^2.1.0",
     "@types/supertest": "^6.0.0",
-    "@types/swagger-ui-express": "^4.1.8",
     "mongodb-memory-server": "^10.4.0",
     "supertest": "^7.1.0",
     "tsx": "^4.19.0",

@@ -1,7 +1,9 @@
 import { createApp } from './app.js';
 import { connectDb } from './db.js';
 import { config } from './config.js';
-import { log } from './logger.js';
+import { createLogger } from '@shire/shared';
+
+const { log } = createLogger(config.serviceName);
 
 async function main() {
   await connectDb();

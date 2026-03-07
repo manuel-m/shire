@@ -1,13 +1,17 @@
 import express from 'express';
+import { requestId, createHealthRouter, createMetrics, mountSwagger } from '@shire/shared';
 import { authRouter } from './routes/auth.js';
-import { healthRouter } from './routes/health.js';
-import { metricsRouter } from './metrics.js';
-import { requestId } from './middleware/request-id.js';
-import { httpRequestDuration, httpRequestTotal } from './metrics.js';
-import { mountSwagger } from './openapi/swagger.js';
+import { config } from './config.js';
+import { registry } from './openapi/registry.js';
+
+// Side-effect imports — register all OpenAPI paths
+import './routes/health.openapi.js';
+import './routes/auth.openapi.js';
 
 export function createApp(): express.Application {
   const app = express();
+  const { metricsRouter, httpRequestDuration, httpRequestTotal } = createMetrics();
+  const healthRouter = createHealthRouter(config.serviceName);
 
   app.use(express.json());
   app.use(requestId);
@@ -28,7 +32,11 @@ export function createApp(): express.Application {
   app.use(metricsRouter);
   app.use('/auth', authRouter);
 
-  mountSwagger(app);
+  mountSwagger(app, registry, {
+    title: 'Shire Auth Service',
+    version: '0.1.0',
+    description: 'JWT authentication and user management',
+  });
 
   return app;
 }

@@ -2,7 +2,10 @@ import { Router, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { CreateContactSchema, UpdateContactSchema } from '@shire/shared-types';
 import { getClientsCollection, getContactsCollection } from '../db.js';
-import { requireAuth } from '../middleware/auth.js';
+import { createAuthMiddleware } from '@shire/shared';
+import { config } from '../config.js';
+
+const { requireAuth } = createAuthMiddleware(config.jwtSecret);
 
 export const contactsRouter = Router({ mergeParams: true });
 

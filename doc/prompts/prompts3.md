@@ -61,7 +61,7 @@ Type checking:
 ```
 /services
   /auth-service
-  /customer-service
+  /client-service
 
 /packages
   /shared
