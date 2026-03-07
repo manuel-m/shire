@@ -27,6 +27,30 @@ services:
         max-file: "3"
         tag: "auth-service"
 
+  client-service:
+    build:
+      context: ..
+      dockerfile: services/client-service/Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - CLIENT_SERVICE_PORT=3002
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-client?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - CREDENTIALS_ENCRYPTION_KEY=${CREDENTIALS_ENCRYPTION_KEY:-change-me-in-production}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "client-service"
+
   # ── Database ───────────────────────────────────────────────────────
 
   mongodb:

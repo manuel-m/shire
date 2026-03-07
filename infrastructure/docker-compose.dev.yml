@@ -13,6 +13,16 @@ services:
     environment:
       - BCRYPT_ROUNDS=4
 
+  client-service:
+    build:
+      context: ..
+      dockerfile: services/client-service/Dockerfile
+      target: base
+    command: pnpm --filter @shire/client-service dev
+    volumes:
+      - ../packages/shared-types/src:/app/packages/shared-types/src:ro
+      - ../services/client-service/src:/app/services/client-service/src:ro
+
   mongodb:
     ports:
       - "27017:27017"
