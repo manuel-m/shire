@@ -9,7 +9,7 @@ services:
       - "3001:3001"
     environment:
       - AUTH_SERVICE_PORT=3001
-      - MONGODB_URI=mongodb://mongodb:27017/shire-auth
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-auth?authSource=admin
       - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
       - JWT_EXPIRES_IN=15m
       - REFRESH_TOKEN_EXPIRES_IN_DAYS=7
@@ -31,13 +31,16 @@ services:
 
   mongodb:
     image: mongo:7
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-password}
     volumes:
       - mongodb-data:/data/db
     networks:
       - shire-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "-u", "admin", "-p", "${MONGO_PASSWORD:-password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
