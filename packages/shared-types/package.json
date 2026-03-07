@@ -17,9 +17,12 @@
     "lint": "echo 'no linter configured yet'"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "openapi3-ts": "^4.5.0",
     "typescript": "^5.7.0"
   }
 }

@@ -4,6 +4,7 @@ import { healthRouter } from './routes/health.js';
 import { metricsRouter } from './metrics.js';
 import { requestId } from './middleware/request-id.js';
 import { httpRequestDuration, httpRequestTotal } from './metrics.js';
+import { mountSwagger } from './openapi/swagger.js';
 
 export function createApp(): express.Application {
   const app = express();
@@ -26,6 +27,8 @@ export function createApp(): express.Application {
   app.use(healthRouter);
   app.use(metricsRouter);
   app.use('/auth', authRouter);
+
+  mountSwagger(app);
 
   return app;
 }

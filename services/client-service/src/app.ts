@@ -5,6 +5,7 @@ import { contactsRouter } from './routes/contacts.js';
 import { credentialsRouter } from './routes/credentials.js';
 import { metricsRouter, httpRequestDuration, httpRequestTotal } from './metrics.js';
 import { requestId } from './middleware/request-id.js';
+import { mountSwagger } from './openapi/swagger.js';
 
 export function createApp(): express.Application {
   const app = express();
@@ -29,6 +30,8 @@ export function createApp(): express.Application {
   app.use('/clients', clientsRouter);
   app.use('/clients/:id/contacts', contactsRouter);
   app.use('/clients/:id/credentials', credentialsRouter);
+
+  mountSwagger(app);
 
   return app;
 }

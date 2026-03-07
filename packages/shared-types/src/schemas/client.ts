@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import '../openapi/init.js';
 import { PaginationQuerySchema } from './common.js';
 
 export const CodeCredentialsSchema = z.object({
   repoUrls: z.array(z.string()).optional(),
   sshKeys: z.array(z.string()).optional(),
   tokens: z.array(z.string()).optional(),
-});
+}).openapi('CodeCredentials');
 
 export const ClientSchema = z.object({
   _id: z.string(),
@@ -17,7 +18,7 @@ export const ClientSchema = z.object({
   codeCredentials: CodeCredentialsSchema.optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
-});
+}).openapi('Client');
 
 export const CreateClientSchema = z.object({
   companyName: z.string().min(1),
@@ -25,7 +26,7 @@ export const CreateClientSchema = z.object({
   industry: z.string().optional(),
   technicalStack: z.array(z.string()).default([]),
   notes: z.string().optional(),
-});
+}).openapi('CreateClient');
 
 export const UpdateClientSchema = z.object({
   companyName: z.string().min(1).optional(),
@@ -33,18 +34,18 @@ export const UpdateClientSchema = z.object({
   industry: z.string().optional(),
   technicalStack: z.array(z.string()).optional(),
   notes: z.string().optional(),
-});
+}).openapi('UpdateClient');
 
 export const ClientFilterQuerySchema = PaginationQuerySchema.extend({
   industry: z.string().optional(),
   companyName: z.string().optional(),
-});
+}).openapi('ClientFilterQuery');
 
 export const CodeCredentialsInputSchema = z.object({
   repoUrls: z.array(z.string()).optional(),
   sshKeys: z.array(z.string()).optional(),
   tokens: z.array(z.string()).optional(),
-});
+}).openapi('CodeCredentialsInput');
 
 export const CodeCredentialsOutputSchema = CodeCredentialsInputSchema;
 
