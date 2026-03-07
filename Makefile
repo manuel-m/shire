@@ -2,7 +2,7 @@ COMPOSE_DIR := infrastructure
 COMPOSE := docker compose -f $(COMPOSE_DIR)/docker-compose.yml
 COMPOSE_DEV := $(COMPOSE) -f $(COMPOSE_DIR)/docker-compose.dev.yml
 
-.PHONY: up down dev dev-down logs build reset clean test verify-auth verify
+.PHONY: up down dev dev-down logs build reset clean test verify-auth verify-logs verify
 
 ## Start all services (production-like)
 up:
@@ -39,8 +39,13 @@ clean:
 test:
 	pnpm --filter @shire/auth-service test
 
-verify: clean up test verify-auth
+## Full verification: reset state, start stack, run all checks
+verify: reset up verify-auth verify-logs
 
 ## Run auth-service verification against a live stack (make reset && make up first)
 verify-auth:
 	./scripts/verify-auth.sh
+
+## Verify logs are flowing through Loki (run after verify-auth)
+verify-logs:
+	./scripts/verify-logs.sh

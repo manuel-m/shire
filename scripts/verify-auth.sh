@@ -3,7 +3,13 @@
 # Designed to run against a freshly started stack (make reset && make up).
 set -euo pipefail
 
-BASE_URL="${AUTH_URL:-http://localhost:3001}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="${SCRIPT_DIR}/../.env"
+if [ -f "$ENV_FILE" ]; then
+  set -a; source "$ENV_FILE"; set +a
+fi
+
+BASE_URL="${AUTH_URL:-http://localhost:${AUTH_SERVICE_PORT:-3001}}"
 PASS=0
 FAIL=0
 
