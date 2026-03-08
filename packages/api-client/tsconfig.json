@@ -15,5 +15,5 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src", "orval.config.ts"]
+  "include": ["src"]
 }

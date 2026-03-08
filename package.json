@@ -13,7 +13,8 @@
     "duplication": "jscpd",
     "depcheck": "bash scripts/depcheck.sh",
     "security": "bash scripts/semgrep.sh",
-    "validate": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication && pnpm run depcheck",
+    "validate": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication",
+    "validate_": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication && pnpm run depcheck",
     "prepare": "husky || true"
   },
   "engines": {

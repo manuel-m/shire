@@ -18,9 +18,6 @@
     "lint": "eslint src/",
     "generate": "orval"
   },
-  "dependencies": {
-    "@tanstack/react-query": "^5.62.0"
-  },
   "devDependencies": {
     "orval": "^7.3.0",
     "typescript": "^5.7.0"

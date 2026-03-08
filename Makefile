@@ -83,7 +83,7 @@ test-billing-service:
 test-bff-service:
 	pnpm --filter @shire/bff-service test
 
-verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement verify-billing
+verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
 
 verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
 
