@@ -14,6 +14,8 @@ clean \
 test \
 test-auth-service \
 test-client-service \
+test-engagement-service \
+test-report-service \
 verify-js \
 verify-auth \
 verify-logs \
@@ -58,13 +60,19 @@ reset:
 clean:
 	$(COMPOSE) down -v --rmi local --remove-orphans
 
-test: test-auth-service test-client-service
+test: test-auth-service test-client-service test-engagement-service test-report-service
 
 test-auth-service:
 	pnpm --filter @shire/auth-service test
 
 test-client-service:
 	pnpm --filter @shire/client-service test
+
+test-engagement-service:
+	pnpm --filter @shire/engagement-service test
+
+test-report-service:
+	pnpm --filter @shire/report-service test
 
 verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement
 

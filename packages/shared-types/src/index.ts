@@ -6,3 +6,4 @@ export * from './schemas/contact.js';
 export * from './schemas/audit-log.js';
 export * from './schemas/engagement.js';
 export * from './schemas/report.js';
+export * from './schemas/billing.js';
