@@ -2,7 +2,25 @@ COMPOSE_DIR := infrastructure
 COMPOSE := docker compose -f $(COMPOSE_DIR)/docker-compose.yml
 COMPOSE_DEV := $(COMPOSE) -f $(COMPOSE_DIR)/docker-compose.dev.yml
 
-.PHONY: up down dev dev-down logs build reset clean test test-auth-service test-client-service verify-js verify-auth verify-logs verify-client verify
+.PHONY: up \
+down \
+dev \
+dev-down \
+format \
+logs \
+build \
+reset \
+clean \
+test \
+test-auth-service \
+test-client-service \
+verify-js \
+verify-auth \
+verify-logs \
+verify-client \
+verify-engagement \
+verify \
+verify-dev
 
 ## Start all services (production-like)
 up:
@@ -19,6 +37,9 @@ dev:
 ## Stop dev mode
 dev-down:
 	$(COMPOSE_DEV) down
+
+format:
+	pnpm run format
 
 ## Tail logs (pass SVC= to filter, e.g. make logs SVC=auth-service)
 logs:
@@ -44,8 +65,9 @@ test-auth-service:
 test-client-service:
 	pnpm --filter @shire/client-service test
 
-## Full verification: reset state, start stack, run all checks
-verify: verify-js test reset up verify-auth verify-logs verify-client
+verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement
+
+verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement
 
 verify-js:
 	pnpm run validate
@@ -60,3 +82,6 @@ verify-logs:
 
 verify-client:
 	./scripts/verify-client.sh
+
+verify-engagement:
+	./scripts/verify-engagement.sh

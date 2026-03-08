@@ -23,15 +23,25 @@ services:
       - ../packages/shared-types/src:/app/packages/shared-types/src:ro
       - ../services/client-service/src:/app/services/client-service/src:ro
 
+  engagement-service:
+    build:
+      context: ..
+      dockerfile: services/engagement-service/Dockerfile
+      target: base
+    command: pnpm --filter @shire/engagement-service dev
+    volumes:
+      - ../packages/shared-types/src:/app/packages/shared-types/src:ro
+      - ../services/engagement-service/src:/app/services/engagement-service/src:ro
+
   mongodb:
     ports:
-      - "27017:27017"
+      - '27017:27017'
 
   compass:
     image: haohanyang/compass-web
     container_name: compass-web
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       CW_MONGO_URI: mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/?authSource=admin
     depends_on:

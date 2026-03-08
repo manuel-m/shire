@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: services/auth-service/Dockerfile
     ports:
-      - "3001:3001"
+      - '3001:3001'
     environment:
       - AUTH_SERVICE_PORT=3001
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-auth?authSource=admin
@@ -23,16 +23,16 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
-        tag: "auth-service"
+        max-size: '10m'
+        max-file: '3'
+        tag: 'auth-service'
 
   client-service:
     build:
       context: ..
       dockerfile: services/client-service/Dockerfile
     ports:
-      - "3002:3002"
+      - '3002:3002'
     environment:
       - CLIENT_SERVICE_PORT=3002
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-client?authSource=admin
@@ -47,9 +47,33 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
-        tag: "client-service"
+        max-size: '10m'
+        max-file: '3'
+        tag: 'client-service'
+
+  engagement-service:
+    build:
+      context: ..
+      dockerfile: services/engagement-service/Dockerfile
+    ports:
+      - '3003:3003'
+    environment:
+      - ENGAGEMENT_SERVICE_PORT=3003
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-engagement?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - CLIENT_SERVICE_URL=http://client-service:3002
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'engagement-service'
 
   # ── Database ───────────────────────────────────────────────────────
 
@@ -64,7 +88,19 @@ services:
       - shire-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "-u", "admin", "-p", "${MONGO_PASSWORD:-password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '-u',
+          'admin',
+          '-p',
+          '${MONGO_PASSWORD:-password}',
+          '--authenticationDatabase',
+          'admin',
+          '--eval',
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -77,8 +113,8 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.retention.time=15d"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
     networks:
       - shire-network
     restart: unless-stopped
@@ -86,7 +122,7 @@ services:
   loki:
     image: grafana/loki:3.1.0
     ports:
-      - "3101:3100"
+      - '3101:3100'
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
       - loki-data:/loki
@@ -110,7 +146,7 @@ services:
   grafana:
     image: grafana/grafana:11.1.0
     ports:
-      - "3100:3000"
+      - '3100:3000'
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
