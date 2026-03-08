@@ -19,6 +19,7 @@ verify-auth \
 verify-logs \
 verify-client \
 verify-engagement \
+verify-report \
 verify \
 verify-dev
 
@@ -67,7 +68,7 @@ test-client-service:
 
 verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement
 
-verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement
+verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report
 
 verify-js:
 	pnpm run validate
@@ -85,3 +86,6 @@ verify-client:
 
 verify-engagement:
 	./scripts/verify-engagement.sh
+
+verify-report:
+	./scripts/verify-report.sh
