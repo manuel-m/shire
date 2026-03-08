@@ -1,8 +1,8 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateEngagementSchema } from '@shire/shared-types';
-import { TextField, Stack, Button, Alert, MenuItem } from '@mui/material';
-import { useState } from 'react';
+import { TextField, Stack, Button, Alert, MenuItem, Autocomplete, CircularProgress } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
 import { authHeaders } from '../../../lib/auth/headers.js';
 
 type EngagementFormData = {
@@ -20,12 +20,51 @@ interface Props {
   onSuccess: () => void;
 }
 
+type ClientOption = { _id: string; companyName: string };
+
+function useClientSearch(query: string) {
+  const [options, setOptions] = useState<ClientOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+
+    if (!query) {
+      setOptions([]);
+      return;
+    }
+
+    debounceRef.current = setTimeout(() => {
+      setLoading(true);
+      const params = new URLSearchParams({ companyName: query, limit: '20' });
+      void fetch(`/api/clients?${params.toString()}`, {
+        headers: authHeaders(),
+      })
+        .then(async (res) => {
+          if (res.ok) {
+            const body = (await res.json()) as { data: ClientOption[] };
+            setOptions(body.data);
+          }
+        })
+        .finally(() => setLoading(false));
+    }, 300);
+
+    return () => clearTimeout(debounceRef.current);
+  }, [query]);
+
+  return { options, loading };
+}
+
 export function EngagementForm({ defaultValues, engagementId, onSuccess }: Readonly<Props>) {
   const [error, setError] = useState<string | null>(null);
+  const [clientSearch, setClientSearch] = useState('');
+  const { options: clientOptions, loading: clientsLoading } = useClientSearch(clientSearch);
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<EngagementFormData>({
     resolver: zodResolver(engagementId ? CreateEngagementSchema.partial() : CreateEngagementSchema),
@@ -61,13 +100,40 @@ export function EngagementForm({ defaultValues, engagementId, onSuccess }: Reado
       <Stack spacing={2} sx={{ mt: 1 }}>
         {error && <Alert severity="error">{error}</Alert>}
         {!engagementId && (
-          <TextField
-            label="Client ID"
-            fullWidth
-            required
-            error={!!errors.clientId}
-            helperText={errors.clientId?.message}
-            {...register('clientId')}
+          <Controller
+            name="clientId"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                options={clientOptions}
+                getOptionLabel={(opt) => opt.companyName}
+                isOptionEqualToValue={(opt, val) => opt._id === val._id}
+                loading={clientsLoading}
+                onInputChange={(_e, value) => setClientSearch(value)}
+                onChange={(_e, value) => field.onChange(value?._id ?? '')}
+                filterOptions={(x) => x}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Client"
+                    required
+                    error={!!errors.clientId}
+                    helperText={errors.clientId?.message ?? 'Search by company name'}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {clientsLoading && <CircularProgress color="inherit" size={20} />}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+            )}
           />
         )}
         <TextField

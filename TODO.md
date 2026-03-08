@@ -7,9 +7,9 @@ webapp
 - [x] engagement-management.md
 - [x] report-management.md
 - [x] billing-invoices.md
-- [ ] container nginx for frontend
-- [ ] seed user
-- [ ] cut exposed port
+- [x] container nginx for frontend
+- [x] seed user
+- [x] cut exposed port
 
 production
 
