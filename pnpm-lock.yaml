@@ -205,6 +205,58 @@ importers:
         specifier: ^3.1.0
         version: 3.2.4(@types/node@25.3.5)(tsx@4.21.0)(yaml@2.8.2)
 
+  services/engagement-service:
+    dependencies:
+      '@asteasolutions/zod-to-openapi':
+        specifier: 7.3.4
+        version: 7.3.4(zod@3.25.76)
+      '@shire/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@shire/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+      mongodb:
+        specifier: ^6.12.0
+        version: 6.21.0
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/express-serve-static-core':
+        specifier: ^5.1.1
+        version: 5.1.1
+      '@types/jsonwebtoken':
+        specifier: ^9.0.0
+        version: 9.0.10
+      '@types/supertest':
+        specifier: ^6.0.0
+        version: 6.0.3
+      jsonwebtoken:
+        specifier: ^9.0.0
+        version: 9.0.3
+      mongodb-memory-server:
+        specifier: ^10.4.0
+        version: 10.4.3
+      supertest:
+        specifier: ^7.1.0
+        version: 7.2.2
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.1.0
+        version: 3.2.4(@types/node@25.3.5)(tsx@4.21.0)(yaml@2.8.2)
+
 packages:
 
   '@asteasolutions/zod-to-openapi@7.3.4':

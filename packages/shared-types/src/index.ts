@@ -4,3 +4,4 @@ export * from './schemas/user.js';
 export * from './schemas/client.js';
 export * from './schemas/contact.js';
 export * from './schemas/audit-log.js';
+export * from './schemas/engagement.js';
