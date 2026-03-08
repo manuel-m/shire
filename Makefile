@@ -20,12 +20,7 @@ test-report-service \
 test-billing-service \
 test-bff-service \
 verify-js \
-verify-auth \
-verify-logs \
-verify-client \
-verify-engagement \
-verify-report \
-verify-billing \
+seed \
 verify \
 verify-dev
 
@@ -84,9 +79,15 @@ test-billing-service:
 test-bff-service:
 	pnpm --filter @shire/bff-service test
 
-verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
+## Run seed container (all verify scripts inside Docker network)
+seed:
+	$(COMPOSE) --profile seed up seed --build --abort-on-container-exit
 
-verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
+## Full pipeline: format + validate + test + reset + up + seed verification
+verify: format verify-js test reset up seed
+
+## Full pipeline in dev mode
+verify-dev: format verify-js test reset dev seed
 
 verify-js: generate-js
 	pnpm run validate
@@ -94,23 +95,3 @@ verify-js: generate-js
 generate-js:
 	pnpm --filter @shire/bff-service dump-openapi
 	pnpm --filter @shire/api-client generate
-
-## Run auth-service verification against a live stack (make reset && make up first)
-verify-auth:
-	./scripts/verify-auth.sh
-
-## Verify logs are flowing through Loki (run after verify-auth)
-verify-logs:
-	./scripts/verify-logs.sh
-
-verify-client:
-	./scripts/verify-client.sh
-
-verify-engagement:
-	./scripts/verify-engagement.sh
-
-verify-report:
-	./scripts/verify-report.sh
-
-verify-billing:
-	./scripts/verify-billing.sh
