@@ -75,6 +75,31 @@ services:
         max-file: '3'
         tag: 'engagement-service'
 
+  report-service:
+    build:
+      context: ..
+      dockerfile: services/report-service/Dockerfile
+    ports:
+      - '3004:3004'
+    environment:
+      - REPORT_SERVICE_PORT=3004
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-report?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - ENGAGEMENT_SERVICE_URL=http://engagement-service:3003
+      - CLIENT_SERVICE_URL=http://client-service:3002
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'report-service'
+
   # ── Database ───────────────────────────────────────────────────────
 
   mongodb:
