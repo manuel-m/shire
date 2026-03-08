@@ -100,6 +100,61 @@ services:
         max-file: '3'
         tag: 'report-service'
 
+  billing-service:
+    build:
+      context: ..
+      dockerfile: services/billing-service/Dockerfile
+    ports:
+      - '3005:3005'
+    environment:
+      - BILLING_SERVICE_PORT=3005
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-billing?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - CLIENT_SERVICE_URL=http://client-service:3002
+      - ENGAGEMENT_SERVICE_URL=http://engagement-service:3003
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'billing-service'
+
+  bff-service:
+    build:
+      context: ..
+      dockerfile: services/bff-service/Dockerfile
+    ports:
+      - '3007:3007'
+    environment:
+      - BFF_SERVICE_PORT=3007
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - CLIENT_SERVICE_URL=http://client-service:3002
+      - ENGAGEMENT_SERVICE_URL=http://engagement-service:3003
+      - REPORT_SERVICE_URL=http://report-service:3004
+      - BILLING_SERVICE_URL=http://billing-service:3005
+    depends_on:
+      - auth-service
+      - client-service
+      - engagement-service
+      - report-service
+      - billing-service
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'bff-service'
+
   # ── Database ───────────────────────────────────────────────────────
 
   mongodb:

@@ -16,12 +16,15 @@ test-auth-service \
 test-client-service \
 test-engagement-service \
 test-report-service \
+test-billing-service \
+test-bff-service \
 verify-js \
 verify-auth \
 verify-logs \
 verify-client \
 verify-engagement \
 verify-report \
+verify-billing \
 verify \
 verify-dev
 
@@ -60,7 +63,7 @@ reset:
 clean:
 	$(COMPOSE) down -v --rmi local --remove-orphans
 
-test: test-auth-service test-client-service test-engagement-service test-report-service
+test: test-auth-service test-client-service test-engagement-service test-report-service test-billing-service test-bff-service
 
 test-auth-service:
 	pnpm --filter @shire/auth-service test
@@ -74,9 +77,15 @@ test-engagement-service:
 test-report-service:
 	pnpm --filter @shire/report-service test
 
-verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement
+test-billing-service:
+	pnpm --filter @shire/billing-service test
 
-verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report
+test-bff-service:
+	pnpm --filter @shire/bff-service test
+
+verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement verify-billing
+
+verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
 
 verify-js:
 	pnpm run validate
@@ -97,3 +106,6 @@ verify-engagement:
 
 verify-report:
 	./scripts/verify-report.sh
+
+verify-billing:
+	./scripts/verify-billing.sh
