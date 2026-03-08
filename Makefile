@@ -81,7 +81,8 @@ test-bff-service:
 
 ## Run seed container (all verify scripts inside Docker network)
 seed:
-	$(COMPOSE) --profile seed up seed --build --abort-on-container-exit
+	$(COMPOSE) --profile seed build seed
+	$(COMPOSE) --profile seed up seed --no-deps --abort-on-container-exit
 
 ## Full pipeline: format + validate + test + reset + up + seed verification
 verify: format verify-js test reset up seed
