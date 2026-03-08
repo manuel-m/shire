@@ -155,6 +155,24 @@ services:
         max-file: '3'
         tag: 'bff-service'
 
+  web-app:
+    build:
+      context: ..
+      dockerfile: apps/web-app/Dockerfile
+    ports:
+      - '8888:80'
+    depends_on:
+      - bff-service
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'web-app'
+
   # ── Database ───────────────────────────────────────────────────────
 
   mongodb:
