@@ -9,7 +9,7 @@ if [ -f "$ENV_FILE" ]; then
   set -a; source "$ENV_FILE"; set +a
 fi
 
-LOKI_URL="${LOKI_URL:-http://localhost:${LOKI_PORT:-3101}}"
+LOKI_URL="${LOKI_URL:-http://loki:3100}"
 PASS=0
 FAIL=0
 

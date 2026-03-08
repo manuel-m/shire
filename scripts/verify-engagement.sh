@@ -9,9 +9,9 @@ if [ -f "$ENV_FILE" ]; then
   set -a; source "$ENV_FILE"; set +a
 fi
 
-BASE_URL="${ENGAGEMENT_URL:-http://localhost:${ENGAGEMENT_SERVICE_PORT:-3003}}"
-CLIENT_URL="${CLIENT_URL:-http://localhost:${CLIENT_SERVICE_PORT:-3002}}"
-AUTH_URL="${AUTH_URL:-http://localhost:${AUTH_SERVICE_PORT:-3001}}"
+BASE_URL="${ENGAGEMENT_URL:-http://engagement-service:3003}"
+CLIENT_URL="${CLIENT_URL:-http://client-service:3002}"
+AUTH_URL="${AUTH_URL:-http://auth-service:3001}"
 PASS=0
 FAIL=0
 

@@ -18,6 +18,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -40,6 +45,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3002/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -62,6 +72,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -85,6 +100,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3004/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -108,6 +128,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3005/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -130,14 +155,24 @@ services:
       - REPORT_SERVICE_URL=http://report-service:3004
       - BILLING_SERVICE_URL=http://billing-service:3005
     depends_on:
-      - auth-service
-      - client-service
-      - engagement-service
-      - report-service
-      - billing-service
+      auth-service:
+        condition: service_healthy
+      client-service:
+        condition: service_healthy
+      engagement-service:
+        condition: service_healthy
+      report-service:
+        condition: service_healthy
+      billing-service:
+        condition: service_healthy
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3007/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -152,7 +187,8 @@ services:
     ports:
       - '8888:80'
     depends_on:
-      - bff-service
+      bff-service:
+        condition: service_healthy
     networks:
       - shire-network
     restart: unless-stopped
@@ -162,6 +198,31 @@ services:
         max-size: '10m'
         max-file: '3'
         tag: 'web-app'
+
+  # ── Seed / Verification ──────────────────────────────────────────
+
+  seed:
+    build:
+      context: ..
+      dockerfile: infrastructure/seed/Dockerfile
+    environment:
+      - AUTH_URL=http://auth-service:3001
+      - CLIENT_URL=http://client-service:3002
+      - ENGAGEMENT_URL=http://engagement-service:3003
+      - REPORT_URL=http://report-service:3004
+      - BILLING_URL=http://billing-service:3005
+      - LOKI_URL=http://loki:3100
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+    depends_on:
+      bff-service:
+        condition: service_healthy
+      loki:
+        condition: service_started
+    networks:
+      - shire-network
+    restart: 'no'
+    profiles:
+      - seed
 
   # ── Database ───────────────────────────────────────────────────────
 

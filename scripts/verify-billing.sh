@@ -9,10 +9,10 @@ if [ -f "$ENV_FILE" ]; then
   set -a; source "$ENV_FILE"; set +a
 fi
 
-BASE_URL="${BILLING_URL:-http://localhost:${BILLING_SERVICE_PORT:-3005}}"
-ENGAGEMENT_URL="${ENGAGEMENT_URL:-http://localhost:${ENGAGEMENT_SERVICE_PORT:-3003}}"
-CLIENT_URL="${CLIENT_URL:-http://localhost:${CLIENT_SERVICE_PORT:-3002}}"
-AUTH_URL="${AUTH_URL:-http://localhost:${AUTH_SERVICE_PORT:-3001}}"
+BASE_URL="${BILLING_URL:-http://billing-service:3005}"
+ENGAGEMENT_URL="${ENGAGEMENT_URL:-http://engagement-service:3003}"
+CLIENT_URL="${CLIENT_URL:-http://client-service:3002}"
+AUTH_URL="${AUTH_URL:-http://auth-service:3001}"
 PASS=0
 FAIL=0
 
@@ -176,8 +176,8 @@ echo ""
 
 # ── 4. Create an invoice ─────────────────────────────────────────────
 echo "4. Create an invoice"
-ISSUE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-DUE_DATE=$(date -u -d "+30 days" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+30d +%Y-%m-%dT%H:%M:%SZ)
+ISSUE_DATE=$(python3 -c "from datetime import datetime,timezone; print(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))")
+DUE_DATE=$(python3 -c "from datetime import datetime,timedelta,timezone; print((datetime.now(timezone.utc)+timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%SZ'))")
 RESP=$(curl -sw '\n%{http_code}' -X POST "$BASE_URL/invoices" \
   -H "$AUTH_HEADER" \
   -H "Content-Type: application/json" \
