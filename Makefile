@@ -8,6 +8,7 @@ dev \
 dev-down \
 format \
 logs \
+generate-js \
 build \
 reset \
 clean \
@@ -87,8 +88,12 @@ verify: format verify-js test reset up verify-auth verify-logs verify-client ver
 
 verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report verify-billing
 
-verify-js:
+verify-js: generate-js
 	pnpm run validate
+
+generate-js:
+	pnpm --filter @shire/bff-service dump-openapi
+	pnpm --filter @shire/api-client generate
 
 ## Run auth-service verification against a live stack (make reset && make up first)
 verify-auth:

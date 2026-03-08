@@ -5,8 +5,6 @@ services:
     build:
       context: ..
       dockerfile: services/auth-service/Dockerfile
-    ports:
-      - '3001:3001'
     environment:
       - AUTH_SERVICE_PORT=3001
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-auth?authSource=admin
@@ -31,8 +29,6 @@ services:
     build:
       context: ..
       dockerfile: services/client-service/Dockerfile
-    ports:
-      - '3002:3002'
     environment:
       - CLIENT_SERVICE_PORT=3002
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-client?authSource=admin
@@ -55,8 +51,6 @@ services:
     build:
       context: ..
       dockerfile: services/engagement-service/Dockerfile
-    ports:
-      - '3003:3003'
     environment:
       - ENGAGEMENT_SERVICE_PORT=3003
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-engagement?authSource=admin
@@ -79,8 +73,6 @@ services:
     build:
       context: ..
       dockerfile: services/report-service/Dockerfile
-    ports:
-      - '3004:3004'
     environment:
       - REPORT_SERVICE_PORT=3004
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-report?authSource=admin
@@ -104,8 +96,6 @@ services:
     build:
       context: ..
       dockerfile: services/billing-service/Dockerfile
-    ports:
-      - '3005:3005'
     environment:
       - BILLING_SERVICE_PORT=3005
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-billing?authSource=admin
@@ -219,8 +209,6 @@ services:
 
   loki:
     image: grafana/loki:3.1.0
-    ports:
-      - '3101:3100'
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
       - loki-data:/loki
