@@ -8,18 +8,19 @@ dev \
 dev-down \
 format \
 logs \
+generate-js \
 build \
 reset \
 clean \
 test \
 test-auth-service \
 test-client-service \
+test-engagement-service \
+test-report-service \
+test-billing-service \
+test-bff-service \
 verify-js \
-verify-auth \
-verify-logs \
-verify-client \
-verify-engagement \
-verify-report \
+seed \
 verify \
 verify-dev
 
@@ -58,7 +59,7 @@ reset:
 clean:
 	$(COMPOSE) down -v --rmi local --remove-orphans
 
-test: test-auth-service test-client-service
+test: test-auth-service test-client-service test-engagement-service test-report-service test-billing-service test-bff-service
 
 test-auth-service:
 	pnpm --filter @shire/auth-service test
@@ -66,26 +67,32 @@ test-auth-service:
 test-client-service:
 	pnpm --filter @shire/client-service test
 
-verify: format verify-js test reset up verify-auth verify-logs verify-client verify-engagement
+test-engagement-service:
+	pnpm --filter @shire/engagement-service test
 
-verify-dev: format verify-js test reset dev verify-auth verify-logs verify-client verify-engagement verify-report
+test-report-service:
+	pnpm --filter @shire/report-service test
 
-verify-js:
+test-billing-service:
+	pnpm --filter @shire/billing-service test
+
+test-bff-service:
+	pnpm --filter @shire/bff-service test
+
+## Run seed container (all verify scripts inside Docker network)
+seed:
+	$(COMPOSE) --profile seed build seed
+	$(COMPOSE) --profile seed up seed --no-deps --abort-on-container-exit
+
+## Full pipeline: format + validate + test + reset + up + seed verification
+verify: format verify-js test reset up seed
+
+## Full pipeline in dev mode
+verify-dev: format verify-js test reset dev seed
+
+verify-js: generate-js
 	pnpm run validate
 
-## Run auth-service verification against a live stack (make reset && make up first)
-verify-auth:
-	./scripts/verify-auth.sh
-
-## Verify logs are flowing through Loki (run after verify-auth)
-verify-logs:
-	./scripts/verify-logs.sh
-
-verify-client:
-	./scripts/verify-client.sh
-
-verify-engagement:
-	./scripts/verify-engagement.sh
-
-verify-report:
-	./scripts/verify-report.sh
+generate-js:
+	pnpm --filter @shire/bff-service dump-openapi
+	pnpm --filter @shire/api-client generate

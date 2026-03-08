@@ -33,6 +33,36 @@ services:
       - ../packages/shared-types/src:/app/packages/shared-types/src:ro
       - ../services/engagement-service/src:/app/services/engagement-service/src:ro
 
+  report-service:
+    build:
+      context: ..
+      dockerfile: services/report-service/Dockerfile
+      target: base
+    command: pnpm --filter @shire/report-service dev
+    volumes:
+      - ../packages/shared-types/src:/app/packages/shared-types/src:ro
+      - ../services/report-service/src:/app/services/report-service/src:ro
+
+  billing-service:
+    build:
+      context: ..
+      dockerfile: services/billing-service/Dockerfile
+      target: base
+    command: pnpm --filter @shire/billing-service dev
+    volumes:
+      - ../packages/shared-types/src:/app/packages/shared-types/src:ro
+      - ../services/billing-service/src:/app/services/billing-service/src:ro
+
+  bff-service:
+    build:
+      context: ..
+      dockerfile: services/bff-service/Dockerfile
+      target: base
+    command: pnpm --filter @shire/bff-service dev
+    volumes:
+      - ../packages/shared-types/src:/app/packages/shared-types/src:ro
+      - ../services/bff-service/src:/app/services/bff-service/src:ro
+
   mongodb:
     ports:
       - '27017:27017'

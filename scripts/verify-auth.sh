@@ -9,7 +9,7 @@ if [ -f "$ENV_FILE" ]; then
   set -a; source "$ENV_FILE"; set +a
 fi
 
-BASE_URL="${AUTH_URL:-http://localhost:${AUTH_SERVICE_PORT:-3001}}"
+BASE_URL="${AUTH_URL:-http://auth-service:3001}"
 PASS=0
 FAIL=0
 

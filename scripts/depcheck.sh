@@ -9,7 +9,7 @@ for dir in packages/*/  services/*/; do
     continue
   fi
   echo "--- Checking $dir ---"
-  if ! npx depcheck "$dir" --ignores="$IGNORE"; then
+  if ! npx depcheck "$dir" --ignores="$IGNORE" --detailed; then
     EXIT_CODE=1
   fi
 done

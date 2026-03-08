@@ -1,0 +1,37 @@
+{
+  "name": "@shire/billing-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:unit": "vitest run src/**/*.unit.test.ts",
+    "test:integration": "vitest run src/**/*.integration.test.ts"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "7.3.4",
+    "@shire/shared": "workspace:*",
+    "@shire/shared-types": "workspace:*",
+    "express": "^5.1.0",
+    "mongodb": "^6.12.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/express-serve-static-core": "^5.1.1",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/supertest": "^6.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongodb-memory-server": "^10.4.0",
+    "supertest": "^7.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  }
+}

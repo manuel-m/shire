@@ -63,6 +63,7 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Single entry point for all client requests. Routes to downstream services, enforces authentication via Auth Service.
 
 **Responsibilities:**
+
 - Request routing and proxying
 - JWT validation (delegates to Auth Service)
 - Rate limiting
@@ -77,19 +78,20 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** User authentication, JWT token issuance and validation, user management.
 
 **Collections:**
+
 - `users` — user accounts (email, passwordHash, role, createdAt, updatedAt)
 - `refresh_tokens` — active refresh tokens
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /auth/register | Register a new user |
-| POST | /auth/login | Authenticate and receive JWT |
-| POST | /auth/refresh | Refresh access token |
-| POST | /auth/logout | Invalidate refresh token |
-| GET | /auth/me | Get current user profile |
-| PUT | /auth/me | Update current user profile |
+| Method | Path           | Description                  |
+| ------ | -------------- | ---------------------------- |
+| POST   | /auth/register | Register a new user          |
+| POST   | /auth/login    | Authenticate and receive JWT |
+| POST   | /auth/refresh  | Refresh access token         |
+| POST   | /auth/logout   | Invalidate refresh token     |
+| GET    | /auth/me       | Get current user profile     |
+| PUT    | /auth/me       | Update current user profile  |
 
 **Dependencies:** None (standalone).
 
@@ -100,24 +102,25 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Manage consulting clients, their contacts, and code credentials.
 
 **Collections:**
+
 - `clients` — company information, technical stack, notes, codeCredentials (encrypted)
 - `contacts` — people associated with clients
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /clients | Create client |
-| GET | /clients | List clients |
-| GET | /clients/:id | Get client details |
-| PUT | /clients/:id | Update client |
-| DELETE | /clients/:id | Delete client |
-| POST | /clients/:id/contacts | Add contact |
-| GET | /clients/:id/contacts | List contacts |
-| PUT | /clients/:id/contacts/:contactId | Update contact |
-| DELETE | /clients/:id/contacts/:contactId | Delete contact |
-| PUT | /clients/:id/credentials | Update code credentials |
-| GET | /clients/:id/credentials | Get code credentials (access-logged) |
+| Method | Path                             | Description                          |
+| ------ | -------------------------------- | ------------------------------------ |
+| POST   | /clients                         | Create client                        |
+| GET    | /clients                         | List clients                         |
+| GET    | /clients/:id                     | Get client details                   |
+| PUT    | /clients/:id                     | Update client                        |
+| DELETE | /clients/:id                     | Delete client                        |
+| POST   | /clients/:id/contacts            | Add contact                          |
+| GET    | /clients/:id/contacts            | List contacts                        |
+| PUT    | /clients/:id/contacts/:contactId | Update contact                       |
+| DELETE | /clients/:id/contacts/:contactId | Delete contact                       |
+| PUT    | /clients/:id/credentials         | Update code credentials              |
+| GET    | /clients/:id/credentials         | Get code credentials (access-logged) |
 
 **Dependencies:** None.
 
@@ -128,19 +131,20 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Manage consulting engagements and their lifecycle.
 
 **Collections:**
+
 - `engagements` — engagement data including type, accessType, status, priority, timeline, creationDate
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /engagements | Create engagement |
-| GET | /engagements | List engagements (filterable) |
-| GET | /engagements/:id | Get engagement details |
-| PUT | /engagements/:id | Update engagement |
-| PATCH | /engagements/:id/status | Update engagement status |
-| DELETE | /engagements/:id | Delete engagement |
-| GET | /engagements/client/:clientId | Get engagements by client |
+| Method | Path                          | Description                   |
+| ------ | ----------------------------- | ----------------------------- |
+| POST   | /engagements                  | Create engagement             |
+| GET    | /engagements                  | List engagements (filterable) |
+| GET    | /engagements/:id              | Get engagement details        |
+| PUT    | /engagements/:id              | Update engagement             |
+| PATCH  | /engagements/:id/status       | Update engagement status      |
+| DELETE | /engagements/:id              | Delete engagement             |
+| GET    | /engagements/client/:clientId | Get engagements by client     |
 
 **Dependencies:** Client Service (validates clientId).
 
@@ -151,21 +155,22 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Create, version, and generate consulting reports.
 
 **Collections:**
+
 - `reports` — structured report data (JSON), version history
 - `report_templates` — markdown templates for rendering
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /reports | Create report |
-| GET | /reports | List reports (filterable) |
-| GET | /reports/:id | Get report |
-| PUT | /reports/:id | Update report data |
-| GET | /reports/:id/versions | List report versions |
-| GET | /reports/:id/versions/:version | Get specific version |
-| POST | /reports/:id/generate/markdown | Generate markdown |
-| POST | /reports/:id/generate/pdf | Generate PDF |
+| Method | Path                           | Description               |
+| ------ | ------------------------------ | ------------------------- |
+| POST   | /reports                       | Create report             |
+| GET    | /reports                       | List reports (filterable) |
+| GET    | /reports/:id                   | Get report                |
+| PUT    | /reports/:id                   | Update report data        |
+| GET    | /reports/:id/versions          | List report versions      |
+| GET    | /reports/:id/versions/:version | Get specific version      |
+| POST   | /reports/:id/generate/markdown | Generate markdown         |
+| POST   | /reports/:id/generate/pdf      | Generate PDF              |
 
 **Dependencies:** Engagement Service (validates engagementId), Client Service (client info for report headers).
 
@@ -176,21 +181,22 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Invoice creation, payment tracking, and reminders.
 
 **Collections:**
+
 - `invoices` — invoice data, status, amounts, dates
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /invoices | Create invoice |
-| GET | /invoices | List invoices (filterable) |
-| GET | /invoices/:id | Get invoice |
-| PUT | /invoices/:id | Update invoice |
-| PATCH | /invoices/:id/status | Update invoice status |
-| POST | /invoices/:id/send | Send invoice |
-| POST | /invoices/:id/remind | Send payment reminder |
-| GET | /invoices/client/:clientId | Get invoices by client |
-| GET | /invoices/engagement/:engagementId | Get invoices by engagement |
+| Method | Path                               | Description                |
+| ------ | ---------------------------------- | -------------------------- |
+| POST   | /invoices                          | Create invoice             |
+| GET    | /invoices                          | List invoices (filterable) |
+| GET    | /invoices/:id                      | Get invoice                |
+| PUT    | /invoices/:id                      | Update invoice             |
+| PATCH  | /invoices/:id/status               | Update invoice status      |
+| POST   | /invoices/:id/send                 | Send invoice               |
+| POST   | /invoices/:id/remind               | Send payment reminder      |
+| GET    | /invoices/client/:clientId         | Get invoices by client     |
+| GET    | /invoices/engagement/:engagementId | Get invoices by engagement |
 
 **Dependencies:** Client Service (client details for invoice), Engagement Service (engagement reference).
 
@@ -201,16 +207,17 @@ All services communicate over a Docker bridge network via synchronous REST. Each
 **Purpose:** Aggregate business metrics and provide dashboard data.
 
 **Collections:**
+
 - `metrics_snapshots` — periodic snapshots of computed metrics
 
 **Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /analytics/dashboard | Get dashboard metrics |
-| GET | /analytics/revenue | Get revenue breakdown |
-| GET | /analytics/activity | Get monthly activity summary |
-| GET | /analytics/clients | Get client statistics |
+| Method | Path                 | Description                  |
+| ------ | -------------------- | ---------------------------- |
+| GET    | /analytics/dashboard | Get dashboard metrics        |
+| GET    | /analytics/revenue   | Get revenue breakdown        |
+| GET    | /analytics/activity  | Get monthly activity summary |
+| GET    | /analytics/clients   | Get client statistics        |
 
 **Dependencies:** All other services (reads data for aggregation).
 
@@ -242,11 +249,13 @@ const ClientSchema = z.object({
   industry: z.string().optional(),
   technicalStack: z.array(z.string()),
   notes: z.string().optional(),
-  codeCredentials: z.object({
-    repoUrls: z.array(z.string()).optional(),
-    sshKeys: z.array(z.string()).optional(),    // encrypted
-    tokens: z.array(z.string()).optional(),      // encrypted
-  }).optional(),
+  codeCredentials: z
+    .object({
+      repoUrls: z.array(z.string()).optional(),
+      sshKeys: z.array(z.string()).optional(), // encrypted
+      tokens: z.array(z.string()).optional(), // encrypted
+    })
+    .optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -275,11 +284,13 @@ const EngagementSchema = z.object({
   priority: z.enum(['low', 'medium', 'high', 'critical']),
   status: z.enum(['requested', 'diagnosis', 'in-progress', 'waiting-for-client', 'completed']),
   assignedConsultant: z.string().optional(),
-  timeline: z.object({
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
-    estimatedHours: z.number().optional(),
-  }).optional(),
+  timeline: z
+    .object({
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
+      estimatedHours: z.number().optional(),
+    })
+    .optional(),
   creationDate: z.date(),
   updatedAt: z.date(),
 });
@@ -298,25 +309,31 @@ const ReportSchema = z.object({
   sections: z.object({
     executiveSummary: z.string(),
     architectureOverview: z.string().optional(),
-    problems: z.array(z.object({
-      title: z.string(),
-      severity: z.enum(['low', 'medium', 'high', 'critical']),
-      description: z.string(),
-      impact: z.string().optional(),
-    })),
-    recommendations: z.array(z.object({
-      title: z.string(),
-      priority: z.enum(['low', 'medium', 'high']),
-      description: z.string(),
-      effort: z.string().optional(),
-    })),
-    actionPlan: z.array(z.object({
-      step: z.number(),
-      title: z.string(),
-      description: z.string(),
-      responsible: z.string().optional(),
-      deadline: z.date().optional(),
-    })),
+    problems: z.array(
+      z.object({
+        title: z.string(),
+        severity: z.enum(['low', 'medium', 'high', 'critical']),
+        description: z.string(),
+        impact: z.string().optional(),
+      }),
+    ),
+    recommendations: z.array(
+      z.object({
+        title: z.string(),
+        priority: z.enum(['low', 'medium', 'high']),
+        description: z.string(),
+        effort: z.string().optional(),
+      }),
+    ),
+    actionPlan: z.array(
+      z.object({
+        step: z.number(),
+        title: z.string(),
+        description: z.string(),
+        responsible: z.string().optional(),
+        deadline: z.date().optional(),
+      }),
+    ),
   }),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -334,12 +351,14 @@ const InvoiceSchema = z.object({
   amount: z.number(),
   currency: z.enum(['EUR', 'USD', 'GBP']),
   status: z.enum(['draft', 'issued', 'pending-payment', 'paid', 'overdue']),
-  lineItems: z.array(z.object({
-    description: z.string(),
-    quantity: z.number(),
-    unitPrice: z.number(),
-    total: z.number(),
-  })),
+  lineItems: z.array(
+    z.object({
+      description: z.string(),
+      quantity: z.number(),
+      unitPrice: z.number(),
+      total: z.number(),
+    }),
+  ),
   issueDate: z.date(),
   dueDate: z.date(),
   paidDate: z.date().optional(),
@@ -434,6 +453,9 @@ packages/shared-types/
       invoice.ts          # InvoiceSchema
       user.ts             # UserSchema
       common.ts           # PaginationSchema, ErrorSchema, etc.
+    openapi/
+      init.ts             # extendZodWithOpenApi(z)
+      helpers.ts          # createServiceRegistry(), generateOpenAPIDocument()
     types/
       index.ts            # Inferred TypeScript types from Zod schemas
   package.json            # name: @shire/shared-types
@@ -445,6 +467,50 @@ packages/shared-types/
 - Types are inferred from schemas using `z.infer<typeof Schema>`
 - All services import from this package — no duplicated type definitions
 
+### Zod → OpenAPI → API Client Pipeline
+
+Zod schemas are the single source of truth that drives the entire API surface — from runtime validation to OpenAPI documentation to generated frontend hooks.
+
+```mermaid
+flowchart LR
+    ZOD[Zod Schemas<br/>shared-types] --> OPENAPI[OpenAPI 3.0 Spec<br/>bff-service/openapi.json]
+    OPENAPI --> ORVAL[Orval Code Gen<br/>api-client]
+    ORVAL --> HOOKS[React Query Hooks<br/>web-app]
+
+    style ZOD fill:#e1f5fe
+    style OPENAPI fill:#fff3e0
+    style ORVAL fill:#f3e5f5
+    style HOOKS fill:#c8e6c9
+```
+
+**Step 1 — Zod + OpenAPI metadata:** `@asteasolutions/zod-to-openapi` extends Zod with an `.openapi()` method. Each schema is annotated with its OpenAPI name:
+
+```typescript
+export const InvoiceSchema = z
+  .object({
+    /* ... */
+  })
+  .openapi('Invoice');
+```
+
+**Step 2 — Route registration:** Each service registers its API routes in `*.openapi.ts` files using `registry.registerPath()`, referencing the Zod schemas directly for request/response definitions. These are imported as side-effects at app startup.
+
+**Step 3 — OpenAPI spec generation:** The BFF service aggregates all registered paths into a single OpenAPI 3.0.3 document. `pnpm --filter bff-service dump-openapi` writes `openapi.json`. The spec is also served at runtime via `/openapi.json` and `/swagger` (Swagger UI).
+
+**Step 4 — Client generation:** Orval (`packages/api-client`) reads the BFF's `openapi.json` and generates typed React Query hooks with `pnpm --filter api-client generate`. A custom fetcher handles JWT Bearer token injection and automatic token refresh.
+
+**Step 5 — Frontend consumption:** The web app imports the generated hooks from `@shire/api-client` and wires up token accessors via `setTokenAccessors()` in the auth provider.
+
+**Key packages:**
+
+| Package                          | Role                                                        |
+| -------------------------------- | ----------------------------------------------------------- |
+| `@shire/shared-types`            | Zod schemas with `.openapi()` annotations, registry helpers |
+| `@shire/shared`                  | `mountSwagger()` utility, shared registry with Bearer Auth  |
+| `@shire/api-client`              | Orval-generated React Query hooks, custom fetcher           |
+| `@asteasolutions/zod-to-openapi` | Bridges Zod schemas to OpenAPI definitions                  |
+| `orval`                          | Generates typed API client from OpenAPI spec                |
+
 ---
 
 ## 8. DevOps / Docker Setup
@@ -454,18 +520,18 @@ packages/shared-types/
 ```yaml
 # docker-compose.yml structure
 services:
-  api-gateway:      # port 3000
-  auth-service:     # port 3001
-  client-service:   # port 3002
+  api-gateway: # port 3000
+  auth-service: # port 3001
+  client-service: # port 3002
   engagement-service: # port 3003
-  report-service:   # port 3004
-  billing-service:  # port 3005
+  report-service: # port 3004
+  billing-service: # port 3005
   analytics-service: # port 3006
-  mongodb:          # port 27017
-  prometheus:       # port 9090
-  grafana:          # port 3100
-  loki:             # port 3101
-  alloy:            # telemetry collector
+  mongodb: # port 27017
+  prometheus: # port 9090
+  grafana: # port 3100
+  loki: # port 3101
+  alloy: # telemetry collector
 ```
 
 ### Networking
@@ -561,11 +627,11 @@ shire/
 
 ### Coverage Targets
 
-| Category | Target |
-|----------|--------|
-| Service logic | 80% |
-| API endpoints | 100% |
-| Zod schemas | 100% |
+| Category                | Target                       |
+| ----------------------- | ---------------------------- |
+| Service logic           | 80%                          |
+| API endpoints           | 100%                         |
+| Zod schemas             | 100%                         |
 | Inter-service contracts | Contract tests for all calls |
 
 ### CI Integration
@@ -585,12 +651,12 @@ Tests run on every pull request via GitHub Actions:
 
 ### Components
 
-| Component | Role | Port |
-|-----------|------|------|
-| Prometheus | Metrics collection and storage | 9090 |
-| Grafana | Visualization and dashboards | 3100 |
-| Loki | Log aggregation | 3101 |
-| Grafana Alloy | Telemetry collection agent | — |
+| Component     | Role                           | Port |
+| ------------- | ------------------------------ | ---- |
+| Prometheus    | Metrics collection and storage | 9090 |
+| Grafana       | Visualization and dashboards   | 3100 |
+| Loki          | Log aggregation                | 3101 |
+| Grafana Alloy | Telemetry collection agent     | —    |
 
 ### Instrumentation
 

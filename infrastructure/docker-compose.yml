@@ -5,8 +5,6 @@ services:
     build:
       context: ..
       dockerfile: services/auth-service/Dockerfile
-    ports:
-      - '3001:3001'
     environment:
       - AUTH_SERVICE_PORT=3001
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-auth?authSource=admin
@@ -20,6 +18,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -31,8 +34,6 @@ services:
     build:
       context: ..
       dockerfile: services/client-service/Dockerfile
-    ports:
-      - '3002:3002'
     environment:
       - CLIENT_SERVICE_PORT=3002
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-client?authSource=admin
@@ -44,6 +45,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3002/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -55,8 +61,6 @@ services:
     build:
       context: ..
       dockerfile: services/engagement-service/Dockerfile
-    ports:
-      - '3003:3003'
     environment:
       - ENGAGEMENT_SERVICE_PORT=3003
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-engagement?authSource=admin
@@ -68,6 +72,11 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
@@ -79,8 +88,6 @@ services:
     build:
       context: ..
       dockerfile: services/report-service/Dockerfile
-    ports:
-      - '3004:3004'
     environment:
       - REPORT_SERVICE_PORT=3004
       - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-report?authSource=admin
@@ -93,12 +100,129 @@ services:
     networks:
       - shire-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3004/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     logging:
       driver: json-file
       options:
         max-size: '10m'
         max-file: '3'
         tag: 'report-service'
+
+  billing-service:
+    build:
+      context: ..
+      dockerfile: services/billing-service/Dockerfile
+    environment:
+      - BILLING_SERVICE_PORT=3005
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/shire-billing?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - CLIENT_SERVICE_URL=http://client-service:3002
+      - ENGAGEMENT_SERVICE_URL=http://engagement-service:3003
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3005/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'billing-service'
+
+  bff-service:
+    build:
+      context: ..
+      dockerfile: services/bff-service/Dockerfile
+    ports:
+      - '3007:3007'
+    environment:
+      - BFF_SERVICE_PORT=3007
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - CLIENT_SERVICE_URL=http://client-service:3002
+      - ENGAGEMENT_SERVICE_URL=http://engagement-service:3003
+      - REPORT_SERVICE_URL=http://report-service:3004
+      - BILLING_SERVICE_URL=http://billing-service:3005
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      client-service:
+        condition: service_healthy
+      engagement-service:
+        condition: service_healthy
+      report-service:
+        condition: service_healthy
+      billing-service:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3007/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'bff-service'
+
+  web-app:
+    build:
+      context: ..
+      dockerfile: apps/web-app/Dockerfile
+    ports:
+      - '8888:80'
+    depends_on:
+      bff-service:
+        condition: service_healthy
+    networks:
+      - shire-network
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'web-app'
+
+  # ── Seed / Verification ──────────────────────────────────────────
+
+  seed:
+    build:
+      context: ..
+      dockerfile: infrastructure/seed/Dockerfile
+    environment:
+      - AUTH_URL=http://auth-service:3001
+      - CLIENT_URL=http://client-service:3002
+      - ENGAGEMENT_URL=http://engagement-service:3003
+      - REPORT_URL=http://report-service:3004
+      - BILLING_URL=http://billing-service:3005
+      - LOKI_URL=http://loki:3100
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+    depends_on:
+      bff-service:
+        condition: service_healthy
+      loki:
+        condition: service_started
+    networks:
+      - shire-network
+    restart: 'no'
+    profiles:
+      - seed
 
   # ── Database ───────────────────────────────────────────────────────
 
@@ -146,8 +270,6 @@ services:
 
   loki:
     image: grafana/loki:3.1.0
-    ports:
-      - '3101:3100'
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
       - loki-data:/loki

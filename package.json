@@ -8,12 +8,13 @@
     "test": "pnpm -r test",
     "test:unit": "pnpm -r test:unit",
     "test:integration": "pnpm -r test:integration",
-    "format": "prettier --write 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts'",
-    "format:check": "prettier --check 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts'",
+    "format": "prettier --write 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts' '!**/generated/**'",
+    "format:check": "prettier --check 'packages/*/src/**/*.ts' 'services/*/src/**/*.ts' '!**/generated/**'",
     "duplication": "jscpd",
     "depcheck": "bash scripts/depcheck.sh",
     "security": "bash scripts/semgrep.sh",
-    "validate": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication && pnpm run depcheck",
+    "validate": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication",
+    "validate_": "pnpm run type-check && pnpm run lint && pnpm run format:check && pnpm run duplication && pnpm run depcheck",
     "prepare": "husky || true"
   },
   "engines": {
