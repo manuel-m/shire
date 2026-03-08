@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/",
+    "lint": "eslint src/ --ignore-pattern src/generated/",
     "generate": "orval"
   },
   "devDependencies": {
@@ -24,5 +24,8 @@
   },
   "peerDependencies": {
     "react": "^19.0.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.21"
   }
 }
