@@ -1,14 +1,38 @@
 import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '../../../components/tables/DataTable.js';
+import { Badge, IconButton } from '@mui/material';
+import WorkIcon from '@mui/icons-material/Work';
+import PlusIcon from '@mui/icons-material/Add';
 
 const columns: GridColDef[] = [
   { field: 'companyName', headerName: 'Company', flex: 1 },
-  { field: 'industry', headerName: 'Industry', flex: 0.7 },
+
+  {
+    field: 'actions',
+    headerName: 'Actions',
+    width: 150,
+    sortable: false,
+    renderCell: (params) => (
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          console.log(params);
+          e.stopPropagation();
+        }}
+      >
+        <Badge color="primary" badgeContent={<PlusIcon sx={{ fontSize: '10px' }} />}>
+          <WorkIcon fontSize="medium" />
+        </Badge>
+      </IconButton>
+    ),
+  },
+  { field: 'industry', headerName: 'Industry', flex: 0.5 },
   {
     field: 'technicalStack',
     headerName: 'Tech Stack',
     flex: 1,
-    valueGetter: (_value: unknown, row: Record<string, unknown>) => (row.technicalStack as string[])?.join(', ') || '',
+    valueGetter: (_value: unknown, row: Record<string, unknown>) =>
+      (row.technicalStack as string[])?.join(', ') || '',
   },
   {
     field: 'createdAt',
@@ -37,7 +61,15 @@ interface Props {
   loading: boolean;
 }
 
-export function ClientsTable({ data, total, page, pageSize, onPageChange, onRowClick, loading }: Readonly<Props>) {
+export function ClientsTable({
+  data,
+  total,
+  page,
+  pageSize,
+  onPageChange,
+  onRowClick,
+  loading,
+}: Readonly<Props>) {
   return (
     <DataTable
       rows={data}
