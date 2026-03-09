@@ -17,6 +17,7 @@ type EngagementFormData = {
 interface Props {
   defaultValues?: Partial<EngagementFormData>;
   engagementId?: string;
+  preselectedClient?: ClientOption;
   onSuccess: () => void;
 }
 
@@ -56,7 +57,7 @@ function useClientSearch(query: string) {
   return { options, loading };
 }
 
-export function EngagementForm({ defaultValues, engagementId, onSuccess }: Readonly<Props>) {
+export function EngagementForm({ defaultValues, engagementId, preselectedClient, onSuccess }: Readonly<Props>) {
   const [error, setError] = useState<string | null>(null);
   const [clientSearch, setClientSearch] = useState('');
   const { options: clientOptions, loading: clientsLoading } = useClientSearch(clientSearch);
@@ -99,7 +100,10 @@ export function EngagementForm({ defaultValues, engagementId, onSuccess }: Reado
     <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
       <Stack spacing={2} sx={{ mt: 1 }}>
         {error && <Alert severity="error">{error}</Alert>}
-        {!engagementId && (
+        {!engagementId && preselectedClient && (
+          <TextField label="Client" value={preselectedClient.companyName} disabled fullWidth />
+        )}
+        {!engagementId && !preselectedClient && (
           <Controller
             name="clientId"
             control={control}
