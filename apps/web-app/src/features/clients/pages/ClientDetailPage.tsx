@@ -1,63 +1,19 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Button, Box, Alert, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import EditIcon from '@mui/icons-material/Edit';
 import { ClientDetailCard } from '../components/ClientDetailCard.js';
 import { ContactsTable } from '../../contacts/components/ContactsTable.js';
-import { authHeaders } from '../../../lib/auth/headers.js';
-
-interface Client {
-  _id: string;
-  companyName: string;
-  industry?: string;
-  website?: string;
-  technicalStack: string[];
-  notes?: string;
-  engagementCount?: number;
-  createdAt: string;
-}
-
-interface Contact {
-  _id: string;
-  name: string;
-  email: string;
-  role?: string;
-  phone?: string;
-}
+import { useClient, useClientContacts } from '../api/clientQueries.js';
 
 export function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [client, setClient] = useState<Client | null>(null);
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: client, isLoading: clientLoading, error: clientError } = useClient(id);
+  const { data: contacts } = useClientContacts(id);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const headers = authHeaders();
-        const [clientRes, contactsRes] = await Promise.all([
-          fetch(`/api/clients/${id}`, { headers }),
-          fetch(`/api/clients/${id}/contacts`, { headers }),
-        ]);
-        if (!clientRes.ok) throw new Error('Client not found');
-        setClient((await clientRes.json()) as Client);
-        if (contactsRes.ok) {
-          setContacts((await contactsRes.json()) as Contact[]);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    void fetchData();
-  }, [id]);
-
-  if (loading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (clientLoading) return <CircularProgress />;
+  if (clientError) return <Alert severity="error">{clientError.message}</Alert>;
   if (!client) return null;
 
   return (
@@ -80,7 +36,7 @@ export function ClientDetailPage() {
           <Typography variant="h6" gutterBottom>
             Contacts
           </Typography>
-          <ContactsTable contacts={contacts} />
+          <ContactsTable contacts={contacts ?? []} />
         </Grid>
       </Grid>
     </>
