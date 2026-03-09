@@ -11,6 +11,8 @@ logs \
 generate-js \
 build \
 reset \
+db-backup \
+db-restore \
 clean \
 test \
 test-auth-service \
@@ -58,6 +60,12 @@ reset:
 ## Remove stopped containers, dangling images, and volumes
 clean:
 	$(COMPOSE) down -v --rmi local --remove-orphans
+
+db-backup:
+	bash scripts/admin/mongo.backup.sh
+
+db-restore:
+	bash scripts/admin/mongo.restore.sh
 
 test: test-auth-service test-client-service test-engagement-service test-report-service test-billing-service test-bff-service
 

@@ -1,49 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Button, Box, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { EngagementsTable } from '../components/EngagementsTable.js';
-import { authHeaders } from '../../../lib/auth/headers.js';
-
-interface Engagement {
-  _id: string;
-  description: string;
-  type: string;
-  status: string;
-  priority: string;
-  creationDate: string;
-}
+import { useEngagementsList } from '../api/engagementQueries.js';
 
 export function EngagementsListPage() {
   const navigate = useNavigate();
-  const [data, setData] = useState<Engagement[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useEngagementsList(page, pageSize);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/engagements?page=${page}&limit=${pageSize}`, {
-          headers: authHeaders(),
-        });
-        if (!res.ok) throw new Error('Failed to load engagements');
-        const json = (await res.json()) as { data: Engagement[]; total: number };
-        setData(json.data);
-        setTotal(json.total);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    void fetchData();
-  }, [page, pageSize]);
-
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (error) return <Alert severity="error">{error.message}</Alert>;
 
   return (
     <>
@@ -57,17 +25,17 @@ export function EngagementsListPage() {
           New Engagement
         </Button>
       </Box>
-      {loading && !data.length ? (
+      {isLoading && !data ? (
         <CircularProgress />
       ) : (
         <EngagementsTable
-          data={data}
-          total={total}
+          data={data?.data ?? []}
+          total={data?.total ?? 0}
           page={page}
           pageSize={pageSize}
           onPageChange={(p, ps) => { setPage(p); setPageSize(ps); }}
           onRowClick={(row) => void navigate(`/engagements/${row._id}/edit`)}
-          loading={loading}
+          loading={isLoading}
         />
       )}
     </>

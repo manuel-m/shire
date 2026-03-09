@@ -233,6 +233,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-password}
     volumes:
       - mongodb-data:/data/db
+      - ./backup:/backup
     networks:
       - shire-network
     restart: unless-stopped

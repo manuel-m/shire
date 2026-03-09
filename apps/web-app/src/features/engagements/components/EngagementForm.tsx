@@ -2,8 +2,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateEngagementSchema } from '@shire/shared-types';
 import { TextField, Stack, Button, Alert, MenuItem, Autocomplete, CircularProgress } from '@mui/material';
-import { useState, useEffect, useRef } from 'react';
-import { authHeaders } from '../../../lib/auth/headers.js';
+import { useState } from 'react';
+import { useClientSearch } from '../../clients/api/clientQueries.js';
+import { useCreateEngagement, useUpdateEngagement } from '../api/engagementMutations.js';
 
 type EngagementFormData = {
   clientId: string;
@@ -17,95 +18,46 @@ type EngagementFormData = {
 interface Props {
   defaultValues?: Partial<EngagementFormData>;
   engagementId?: string;
+  preselectedClient?: { _id: string; companyName: string };
   onSuccess: () => void;
 }
 
-type ClientOption = { _id: string; companyName: string };
-
-function useClientSearch(query: string) {
-  const [options, setOptions] = useState<ClientOption[]>([]);
-  const [loading, setLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => {
-    clearTimeout(debounceRef.current);
-
-    if (!query) {
-      setOptions([]);
-      return;
-    }
-
-    debounceRef.current = setTimeout(() => {
-      setLoading(true);
-      const params = new URLSearchParams({ companyName: query, limit: '20' });
-      void fetch(`/api/clients?${params.toString()}`, {
-        headers: authHeaders(),
-      })
-        .then(async (res) => {
-          if (res.ok) {
-            const body = (await res.json()) as { data: ClientOption[] };
-            setOptions(body.data);
-          }
-        })
-        .finally(() => setLoading(false));
-    }, 300);
-
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
-
-  return { options, loading };
-}
-
-export function EngagementForm({ defaultValues, engagementId, onSuccess }: Readonly<Props>) {
-  const [error, setError] = useState<string | null>(null);
+export function EngagementForm({ defaultValues, engagementId, preselectedClient, onSuccess }: Readonly<Props>) {
   const [clientSearch, setClientSearch] = useState('');
-  const { options: clientOptions, loading: clientsLoading } = useClientSearch(clientSearch);
+  const { data: clientOptions, isLoading: clientsLoading } = useClientSearch(clientSearch);
+
+  const createMutation = useCreateEngagement();
+  const updateMutation = useUpdateEngagement(engagementId);
+  const mutation = engagementId ? updateMutation : createMutation;
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<EngagementFormData>({
     resolver: zodResolver(engagementId ? CreateEngagementSchema.partial() : CreateEngagementSchema),
     defaultValues,
   });
 
-  const onSubmit = async (data: EngagementFormData) => {
-    setError(null);
-    const url = engagementId ? `/api/engagements/${engagementId}` : '/api/engagements';
-    const method = engagementId ? 'PUT' : 'POST';
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders(),
-        },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const err = (await res.json()) as { error?: { message?: string } };
-        throw new Error(err.error?.message ?? 'Failed to save engagement');
-      }
-      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    }
+  const onSubmit = (data: EngagementFormData) => {
+    mutation.mutate(data, { onSuccess });
   };
 
   return (
     <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
       <Stack spacing={2} sx={{ mt: 1 }}>
-        {error && <Alert severity="error">{error}</Alert>}
-        {!engagementId && (
+        {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
+        {!engagementId && preselectedClient && (
+          <TextField label="Client" value={preselectedClient.companyName} disabled fullWidth />
+        )}
+        {!engagementId && !preselectedClient && (
           <Controller
             name="clientId"
             control={control}
             render={({ field }) => (
               <Autocomplete
-                options={clientOptions}
+                options={clientOptions ?? []}
                 getOptionLabel={(opt) => opt.companyName}
                 isOptionEqualToValue={(opt, val) => opt._id === val._id}
                 loading={clientsLoading}
@@ -167,9 +119,9 @@ export function EngagementForm({ defaultValues, engagementId, onSuccess }: Reado
           <MenuItem value="critical">Critical</MenuItem>
         </TextField>
         <TextField label="Assigned Consultant" fullWidth {...register('assignedConsultant')} />
-        <Button type="submit" variant="contained" disabled={isSubmitting}>
+        <Button type="submit" variant="contained" disabled={mutation.isPending}>
           {(() => {
-            if (isSubmitting) return 'Saving...';
+            if (mutation.isPending) return 'Saving...';
             return engagementId ? 'Update' : 'Create Engagement';
           })()}
         </Button>

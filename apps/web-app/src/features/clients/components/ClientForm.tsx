@@ -2,8 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateClientSchema } from '@shire/shared-types';
 import { TextField, Stack, Button, Alert } from '@mui/material';
-import { useState } from 'react';
-import { authHeaders } from '../../../lib/auth/headers.js';
+import { useCreateClient, useUpdateClient } from '../api/clientMutations.js';
 
 type ClientFormData = { companyName: string; industry?: string; technicalStack?: string[]; website?: string; notes?: string };
 
@@ -14,45 +13,27 @@ interface Props {
 }
 
 export function ClientForm({ defaultValues, clientId, onSuccess }: Readonly<Props>) {
-  const [error, setError] = useState<string | null>(null);
+  const createMutation = useCreateClient();
+  const updateMutation = useUpdateClient(clientId);
+  const mutation = clientId ? updateMutation : createMutation;
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ClientFormData>({
     resolver: zodResolver(CreateClientSchema),
     defaultValues,
   });
 
-  const onSubmit = async (data: ClientFormData) => {
-    setError(null);
-    const url = clientId ? `/api/clients/${clientId}` : '/api/clients';
-    const method = clientId ? 'PUT' : 'POST';
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders(),
-        },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const err = (await res.json()) as { error?: { message?: string } };
-        throw new Error(err.error?.message ?? 'Failed to save client');
-      }
-      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    }
+  const onSubmit = (data: ClientFormData) => {
+    mutation.mutate(data, { onSuccess });
   };
 
   return (
     <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
       <Stack spacing={2} sx={{ mt: 1 }}>
-        {error && <Alert severity="error">{error}</Alert>}
+        {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
         <TextField
           label="Company Name"
           fullWidth
@@ -64,9 +45,9 @@ export function ClientForm({ defaultValues, clientId, onSuccess }: Readonly<Prop
         <TextField label="Industry" fullWidth {...register('industry')} />
         <TextField label="Website" fullWidth {...register('website')} />
         <TextField label="Notes" fullWidth multiline rows={3} {...register('notes')} />
-        <Button type="submit" variant="contained" disabled={isSubmitting}>
+        <Button type="submit" variant="contained" disabled={mutation.isPending}>
           {(() => {
-            if (isSubmitting) return 'Saving...';
+            if (mutation.isPending) return 'Saving...';
             return clientId ? 'Update Client' : 'Create Client';
           })()}
         </Button>

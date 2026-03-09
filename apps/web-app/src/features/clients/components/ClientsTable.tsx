@@ -1,23 +1,9 @@
 import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '../../../components/tables/DataTable.js';
-
-const columns: GridColDef[] = [
-  { field: 'companyName', headerName: 'Company', flex: 1 },
-  { field: 'industry', headerName: 'Industry', flex: 0.7 },
-  {
-    field: 'technicalStack',
-    headerName: 'Tech Stack',
-    flex: 1,
-    valueGetter: (_value: unknown, row: Record<string, unknown>) => (row.technicalStack as string[])?.join(', ') || '',
-  },
-  {
-    field: 'createdAt',
-    headerName: 'Created',
-    width: 120,
-    valueGetter: (_value: unknown, row: Record<string, unknown>) =>
-      row.createdAt ? new Date(row.createdAt as string).toLocaleDateString() : '',
-  },
-];
+import { Badge, IconButton } from '@mui/material';
+import WorkIcon from '@mui/icons-material/Work';
+import PlusIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
 
 interface Client {
   _id: string;
@@ -37,7 +23,57 @@ interface Props {
   loading: boolean;
 }
 
-export function ClientsTable({ data, total, page, pageSize, onPageChange, onRowClick, loading }: Readonly<Props>) {
+export function ClientsTable({
+  data,
+  total,
+  page,
+  pageSize,
+  onPageChange,
+  onRowClick,
+  loading,
+}: Readonly<Props>) {
+  const navigate = useNavigate();
+
+  const columns: GridColDef[] = [
+    { field: 'companyName', headerName: 'Company', flex: 1 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            const row = params.row as Client;
+            const search = new URLSearchParams({ clientId: row._id, clientName: row.companyName });
+            void navigate(`/engagements/new?${search.toString()}`);
+          }}
+        >
+          <Badge color="primary" badgeContent={<PlusIcon sx={{ fontSize: '10px' }} />}>
+            <WorkIcon fontSize="medium" />
+          </Badge>
+        </IconButton>
+      ),
+    },
+    { field: 'industry', headerName: 'Industry', flex: 0.5 },
+    {
+      field: 'technicalStack',
+      headerName: 'Tech Stack',
+      flex: 1,
+      valueGetter: (_value: unknown, row: Record<string, unknown>) =>
+        (row.technicalStack as string[])?.join(', ') || '',
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created',
+      width: 120,
+      valueGetter: (_value: unknown, row: Record<string, unknown>) =>
+        row.createdAt ? new Date(row.createdAt as string).toLocaleDateString() : '',
+    },
+  ];
+
   return (
     <DataTable
       rows={data}

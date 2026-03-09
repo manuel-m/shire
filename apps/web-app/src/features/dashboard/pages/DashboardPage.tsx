@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography, Alert, CircularProgress, Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import PeopleIcon from '@mui/icons-material/People';
@@ -7,41 +6,12 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import WarningIcon from '@mui/icons-material/Warning';
 import { StatCard } from '../components/StatCard.js';
-import { authHeaders } from '../../../lib/auth/headers.js';
-
-interface DashboardData {
-  totalClients: number;
-  totalEngagements: number;
-  totalReports: number;
-  totalInvoices: number;
-  activeEngagements: number;
-  draftInvoices: number;
-  overdueInvoices: number;
-}
+import { useDashboard } from '../api/dashboardQueries.js';
 
 export function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, error, isLoading } = useDashboard();
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const res = await fetch('/api/dashboard', {
-          headers: authHeaders(),
-        });
-        if (!res.ok) throw new Error('Failed to load dashboard');
-        setData((await res.json()) as DashboardData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    void fetchDashboard();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" p={4}>
         <CircularProgress />
@@ -50,7 +20,7 @@ export function DashboardPage() {
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return <Alert severity="error">{error.message}</Alert>;
   }
 
   if (!data) return null;
