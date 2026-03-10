@@ -112,18 +112,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GEN-02 | Phase 4 | Pending |
 | GEN-03 | Phase 4 | Pending |
 | GEN-04 | Phase 4 | Pending |
-| FE-01 | Phase 5 | Pending |
-| FE-02 | Phase 5 | Pending |
-| FE-03 | Phase 5 | Pending |
-| FE-04 | Phase 5 | Pending |
-| FE-05 | Phase 5 | Pending |
-| FE-06 | Phase 5 | Pending |
+| FE-01 | Phase 4 | Pending |
+| FE-02 | Phase 4 | Pending |
+| FE-03 | Phase 4 | Pending |
+| FE-04 | Phase 4 | Pending |
+| FE-05 | Phase 4 | Pending |
+| FE-06 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 0 (pending roadmap)
+- Mapped to phases: 28/28 ✓
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after initial definition*
+*Last updated: 2026-03-10 after roadmap creation*
