@@ -7,7 +7,8 @@ depends_on: []
 files_modified:
   - services/engagement-service/src/report-invoice-check.ts
   - services/engagement-service/src/config.ts
-autonomous: true
+  - services/engagement-service/src/routes/engagements.ts
+autonomous: false
 requirements: [VAL-02, VAL-03, VAL-04, VAL-05, VAL-06, VAL-07]
 
 must_haves:
@@ -52,7 +53,7 @@ Output: Working HTTP-based validation function with timeout, logging, and fail-o
 @.planning/ROADMAP.md
 @.planning/STATE.md
 @services/engagement-service/src/client-check.ts
-@.planning/research/SUMMARY.md
+@.planning/phases/01-cross-service-validation/VALIDATION.md
 </context>
 
 <interfaces>
@@ -82,6 +83,29 @@ export async function validateClient(
   }
 }
 ```
+
+<!-- Route handler already imports and calls checkAssociatedReportsOrInvoices -->
+From services/engagement-service/src/routes/engagements.ts:
+```typescript
+import * as reportInvoiceCheck from '../report-invoice-check.js';
+
+// DELETE /engagements/:id
+engagementsRouter.delete('/:id', async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+
+  const hasAssociated = await reportInvoiceCheck.checkAssociatedReportsOrInvoices(id);
+  if (hasAssociated) {
+    res.status(409).json({
+      error: {
+        code: 'HAS_ASSOCIATED_RECORDS',
+        message: 'Cannot delete engagement with associated reports or invoices',
+      },
+    });
+    return;
+  }
+  // ... delete logic
+});
+```
 </interfaces>
 
 <tasks>
@@ -96,7 +120,9 @@ export async function validateClient(
     - Test 4: billingServiceUrl points to billing-service:3005
   </behavior>
   <action>Add reportServiceUrl and billingServiceUrl to config.ts following the same pattern as clientServiceUrl. Use Docker Compose service names: http://report-service:3004 and http://billing-service:3005. This allows report-invoice-check.ts to make HTTP calls to both services.</action>
-  <verify>pnpm --filter @shire/engagement-service type-check passes without errors</verify>
+  <verify>
+    <automated>pnpm --filter @shire/engagement-service type-check</automated>
+  </verify>
   <done>reportServiceUrl and billingServiceUrl exported from config.ts with correct URLs</done>
 </task>
 
@@ -125,11 +151,16 @@ export async function validateClient(
 8. DO NOT throw errors - always return boolean for graceful degradation
 
 Note: The current route uses HTTP 409 for HAS_ASSOCIATED_RECORDS. The validation function returns boolean; the route handler converts to HTTP response.</action>
-  <verify>pnpm --filter @shire/engagement-service type-check passes; grep -q "AbortController" services/engagement-service/src/report-invoice-check.ts; grep -q "Promise.allSettled" services/engagement-service/src/report-invoice-check.ts</verify>
+  <verify>
+    <automated>pnpm --filter @shire/engagement-service type-check</automated>
+    <automated>grep -q "AbortController" services/engagement-service/src/report-invoice-check.ts</automated>
+    <automated>grep -q "Promise.allSettled" services/engagement-service/src/report-invoice-check.ts</automated>
+  </verify>
   <done>checkAssociatedReportsOrInvoices makes parallel HTTP calls with timeout and fail-open handling</done>
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
+  <name>Task 3: Verify engagement deletion validation</name>
   <what-built>Complete engagement deletion validation implementation (config + report-invoice-check.ts)</what-built>
   <how-to-verify>
 1. Start services: docker-compose up engagement-service report-service billing-service

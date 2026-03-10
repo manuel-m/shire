@@ -7,13 +7,15 @@ depends_on: []
 files_modified:
   - services/client-service/src/engagement-check.ts
   - services/client-service/src/config.ts
-autonomous: true
+  - services/client-service/src/routes/clients.ts
+  - .planning/phases/01-cross-service-validation/VALIDATION.md
+autonomous: false
 requirements: [VAL-01, VAL-03, VAL-04, VAL-05, VAL-06, VAL-07]
 
 must_haves:
   truths:
     - "User cannot delete a client that has active engagements"
-    - "Validation failures return HTTP 422 with ACTIVE_ENGAGEMENTS error code"
+    - "Validation failures return HTTP 409 with ACTIVE_ENGAGEMENTS error code"
     - "Validation failures are logged with request ID tracing"
     - "HTTP validation calls include 5-second timeout"
     - "Validation handles engagement-service unavailability gracefully (fails open)"
@@ -24,6 +26,8 @@ must_haves:
     - path: "services/client-service/src/config.ts"
       provides: "engagementServiceUrl configuration"
       exports: ["engagementServiceUrl"]
+    - path: ".planning/phases/01-cross-service-validation/VALIDATION.md"
+      provides: "Validation architecture documentation"
   key_links:
     - from: "services/client-service/src/routes/clients.ts"
       to: "services/client-service/src/engagement-check.ts"
@@ -82,6 +86,28 @@ export async function validateClient(
   }
 }
 ```
+
+<!-- Route handler already imports and calls checkActiveEngagements -->
+From services/client-service/src/routes/clients.ts:
+```typescript
+import * as engagementCheck from '../engagement-check.js';
+
+// DELETE /clients/:id
+clientsRouter.delete('/:id', async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const hasActive = await engagementCheck.checkActiveEngagements(id);
+  if (hasActive) {
+    res.status(409).json({
+      error: {
+        code: 'ACTIVE_ENGAGEMENTS',
+        message: 'Cannot delete client with active engagements',
+      },
+    });
+    return;
+  }
+  // ... delete logic
+});
+```
 </interfaces>
 
 <tasks>
@@ -94,7 +120,9 @@ export async function validateClient(
     - Test 2: engagementServiceUrl points to engagement-service:3003
   </behavior>
   <action>Add engagementServiceUrl to config.ts following the same pattern as jwtSecret and serviceName. Use Docker Compose service name: http://engagement-service:3003. This allows engagement-check.ts to make HTTP calls to engagement-service.</action>
-  <verify>pnpm --filter @shire/client-service type-check passes without errors</verify>
+  <verify>
+    <automated>pnpm --filter @shire/client-service type-check</automated>
+  </verify>
   <done>engagementServiceUrl exported from config.ts with correct URL</done>
 </task>
 
@@ -119,12 +147,36 @@ export async function validateClient(
 7. DO NOT throw errors - always return boolean for graceful degradation
 
 Follow the exact pattern from engagement-service/src/client-check.ts but for the use case of checking active engagements (count > 0).</action>
-  <verify>pnpm --filter @shire/client-service type-check passes; grep -q "AbortController" services/client-service/src/engagement-check.ts</verify>
+  <verify>
+    <automated>pnpm --filter @shire/client-service type-check</automated>
+    <automated>grep -q "AbortController" services/client-service/src/engagement-check.ts</automated>
+  </verify>
   <done>checkActiveEngagements makes real HTTP call with timeout and fail-open handling</done>
 </task>
 
+<task type="auto">
+  <name>Task 3: Create VALIDATION.md architecture documentation</name>
+  <files>.planning/phases/01-cross-service-validation/VALIDATION.md</files>
+  <action>Create VALIDATION.md documenting cross-service validation architecture:
+1. Overview: HTTP-based validation between microservices over Docker network
+2. Validation pattern: check functions return boolean, route handlers convert to HTTP status codes
+3. Error codes: ACTIVE_ENGAGEMENTS (409), HAS_ASSOCIATED_RECORDS (409)
+4. Fail-open strategy: return false on errors to allow operations when dependent services are unavailable
+5. Timeouts: 5-second AbortController on all inter-service calls
+6. Logging: structured logs with request ID for tracing
+7. Service URLs: Docker Compose service names (http://service-name:port)
+8. Parallel validation: Promise.allSettled for independent checks (report-service + billing-service)
+
+Reference the implementation in engagement-check.ts and report-invoice-check.ts.</action>
+  <verify>
+    <automated>test -f .planning/phases/01-cross-service-validation/VALIDATION.md && grep -q "Fail-open" .planning/phases/01-cross-service-validation/VALIDATION.md</automated>
+  </verify>
+  <done>VALIDATION.md created with complete validation architecture documentation</done>
+</task>
+
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Complete client deletion validation implementation (config + engagement-check.ts)</what-built>
+  <name>Task 4: Verify client deletion validation</name>
+  <what-built>Complete client deletion validation implementation (config + engagement-check.ts + documentation)</what-built>
   <how-to-verify>
 1. Start services: docker-compose up client-service engagement-service
 2. Create a test client via POST /clients
@@ -146,11 +198,12 @@ Integration tests already exist in services/client-service/src/routes/clients.in
 </verification>
 
 <success_criteria>
-1. Deleting a client with engagements returns 422 with ACTIVE_ENGAGEMENTS error code
+1. Deleting a client with engagements returns 409 with ACTIVE_ENGAGEMENTS error code
 2. Deleting a client without engagements succeeds (204)
 3. HTTP calls timeout after 5 seconds
 4. Engagement-service unavailability logs error and allows deletion (fail-open)
 5. All type checks pass
+6. VALIDATION.md documents the validation architecture
 </success_criteria>
 
 <output>
