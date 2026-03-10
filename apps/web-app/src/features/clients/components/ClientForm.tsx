@@ -31,7 +31,7 @@ export function ClientForm({ defaultValues, clientId, onSuccess }: Readonly<Prop
   };
 
   return (
-    <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={2} sx={{ mt: 1 }}>
         {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
         <TextField
