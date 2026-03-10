@@ -3,9 +3,8 @@ phase: 02-bff-error-handling
 plan: 01
 type: execute
 wave: 1
-depends_on: []
+depends_on: ['00']
 files_modified:
-  - services/bff-service/src/routes/dashboard.integration.test.ts
   - services/bff-service/src/routes/dashboard.ts
 autonomous: true
 requirements:
@@ -24,9 +23,6 @@ must_haves:
     - 'Request ID is propagated to all downstream dashboard service calls'
     - 'Dashboard route handler uses async function (not void async IIFE)'
   artifacts:
-    - path: 'services/bff-service/src/routes/dashboard.integration.test.ts'
-      provides: 'Integration tests for dashboard error handling'
-      min_lines: 50
     - path: 'services/bff-service/src/routes/dashboard.ts'
       provides: 'Refactored dashboard route with proper error handling'
       exports: ['dashboardRouter']
@@ -47,7 +43,9 @@ Refactor dashboard route to replace void async IIFE pattern with top-level async
 
 Purpose: Dashboard currently uses `void (async () => { ... })()` which silently suppresses all errors, causing clients to hang when services fail. This refactoring ensures errors are caught, logged with request ID, and communicated via HTTP 502 BAD_GATEWAY responses.
 
-Output: Dashboard route with proper async handler, try-catch blocks, warning logs for enrichment failures, and integration tests covering error scenarios.
+Output: Dashboard route with proper async handler, try-catch blocks, warning logs for enrichment failures. Integration tests created in Wave 0 Plan 00 will verify behavior.
+
+Note: Integration test file created in Plan 00 (Wave 0). This plan only modifies dashboard.ts implementation.
 </objective>
 
 <execution_context>
@@ -89,36 +87,8 @@ export function createLogger(serviceName: string): {
 
 <tasks>
 
-<task type="auto" tdd="true">
-  <name>Task 1: Create dashboard integration tests</name>
-  <files>services/bff-service/src/routes/dashboard.integration.test.ts</files>
-  <behavior>
-    - Test 1: GET /api/dashboard returns aggregated data when all services are healthy
-    - Test 2: GET /api/dashboard returns partial data when some services fail (Promise.allSettled behavior)
-    - Test 3: GET /api/dashboard logs warnings for failed enrichment (service degradation)
-    - Test 4: GET /api/dashboard propagates X-Request-Id to downstream services
-    - Test 5: GET /api/dashboard returns HTTP 502 with error response on complete failure
-  </behavior>
-  <action>
-    Create integration test file using vitest and supertest. Use Express test utilities to mount dashboardRouter directly. Mock fetchJson to simulate service failures and verify logging behavior. Test scenarios:
-    - Happy path: all services return 200
-    - Partial failure: some services return 502 or timeout
-    - Complete failure: all services fail
-    - Request ID propagation: verify X-Request-Id header passed to fetchJson calls
-
-    Import from services/bff-service/src/routes/dashboard.ts: dashboardRouter
-    Import from services/bff-service/src/lib/service-client.ts: fetchJson (mock via vi.spyOn)
-    Use vi.spyOn on console.log/console.error to verify log entries contain requestId
-
-  </action>
-  <verify>
-    <automated>pnpm --filter @shire/bff-service test:integration</automated>
-  </verify>
-  <done>Integration test file created with 5+ test cases covering error scenarios, tests pass after Task 2 implementation</done>
-</task>
-
 <task type="auto">
-  <name>Task 2: Refactor dashboard route with proper error handling</name>
+  <name>Task 1: Refactor dashboard route with proper error handling</name>
   <files>services/bff-service/src/routes/dashboard.ts</files>
   <action>
     Refactor dashboard.ts GET route handler:
@@ -186,7 +156,7 @@ export function createLogger(serviceName: string): {
 </tasks>
 
 <verification>
-- Run integration tests: `pnpm --filter @shire/bff-service test:integration`
+- Run integration tests (created in Plan 00): `pnpm --filter @shire/bff-service test:integration`
 - Verify no void async IIFE pattern: `grep -r "void (async" services/bff-service/src/routes/dashboard.ts` (should be empty)
 - Verify async handler declaration: `grep "router.get.*async.*=>" services/bff-service/src/routes/dashboard.ts`
 - Verify try-catch block: `grep -A 50 "router.get.*async" services/bff-service/src/routes/dashboard.ts | grep -q "try {"`
@@ -200,7 +170,7 @@ export function createLogger(serviceName: string): {
 3. Individual service failures in Promise.allSettled are logged as warnings with requestId and service name
 4. Partial success works: some services failing returns partial data (zeros for failed services)
 5. All 7 fetchJson calls pass req.requestId (already present, verify unchanged)
-6. Integration tests pass covering happy path, partial failure, and complete failure scenarios
+6. Integration tests (created in Plan 00) pass covering happy path, partial failure, and complete failure scenarios
    </success_criteria>
 
 <output>

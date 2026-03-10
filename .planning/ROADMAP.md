@@ -52,10 +52,23 @@
 4. Request ID is propagated to all downstream service calls
 5. No void async IIFE patterns exist in BFF route handlers
 
-**Plans:** 5 plans
+**Plans:** 10 plans (5 Wave 0 + 5 Wave 1/2)
+
+**Wave 0 (Test Infrastructure):**
+
+- [ ] 02-bff-error-handling-00-PLAN.md — Create dashboard integration test scaffold
+- [ ] 02-bff-error-handling-01a-PLAN.md — Create client detail integration test scaffold
+- [ ] 02-bff-error-handling-02a-PLAN.md — Create engagement detail integration test scaffold
+- [ ] 02-bff-error-handling-03a-PLAN.md — Create report detail integration test scaffold
+- [ ] 02-bff-error-handling-04a-PLAN.md — Create invoice detail integration test scaffold
+
+**Wave 1 (Implementation - Parallel):**
 
 - [ ] 02-bff-error-handling-01-PLAN.md — Refactor dashboard route with async handler and Promise.allSettled
 - [ ] 02-bff-error-handling-02-PLAN.md — Refactor client detail route with async handler and Promise.allSettled
+
+**Wave 2 (Implementation - Parallel):**
+
 - [ ] 02-bff-error-handling-03-PLAN.md — Refactor engagement detail route with async handler and logging
 - [ ] 02-bff-error-handling-04-PLAN.md — Refactor report detail route with async handler and Promise.allSettled
 - [ ] 02-bff-error-handling-05-PLAN.md — Refactor invoice detail route with async handler and Promise.allSettled
@@ -108,7 +121,7 @@
 | Phase                                         | Plans Complete | Status      | Completed  |
 | --------------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10 |
-| 2. BFF Error Handling                         | 0/5            | Not started | -          |
+| 2. BFF Error Handling                         | 0/10           | Not started | -          |
 | 3. OpenAPI Registration                       | 0/0            | Not started | -          |
 | 4. API Client Generation & Frontend Migration | 0/0            | Not started | -          |
 
@@ -137,3 +150,4 @@ _Roadmap created: 2026-03-10_
 _Phase 1 planned: 2026-03-10_
 _Phase 1 executed: 2026-03-10_
 _Phase 2 planned: 2026-03-10_
+_Phase 2 revised: 2026-03-10 (added Wave 0 test plans, fixed ERR-05 coverage)_

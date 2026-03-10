@@ -3,9 +3,8 @@ phase: 02-bff-error-handling
 plan: 05
 type: execute
 wave: 2
-depends_on: []
+depends_on: ['04a']
 files_modified:
-  - services/bff-service/src/routes/invoices.integration.test.ts
   - services/bff-service/src/routes/invoices.ts
 autonomous: true
 requirements:
@@ -24,9 +23,6 @@ must_haves:
     - 'Request ID is propagated to billing, client, and engagement services'
     - 'Invoice detail route handler uses async function (not void async IIFE)'
   artifacts:
-    - path: 'services/bff-service/src/routes/invoices.integration.test.ts'
-      provides: 'Integration tests for invoice detail error handling'
-      min_lines: 40
     - path: 'services/bff-service/src/routes/invoices.ts'
       provides: 'Refactored invoice detail route with proper error handling'
       exports: ['invoicesRouter']
@@ -47,7 +43,9 @@ Refactor invoice detail route to replace void async IIFE with top-level async ha
 
 Purpose: Invoice detail currently uses `void (async () => { ... })()` with `Promise.all` and empty catch block around enrichment. Parallel enrichment fails silently. This refactoring ensures enrichment failures are logged as warnings and partial data is returned.
 
-Output: Invoice detail route with async handler, Promise.allSettled for parallel enrichment, warning logs for failures, and integration tests.
+Output: Invoice detail route with async handler, Promise.allSettled for parallel enrichment, warning logs for failures. Integration tests created in Wave 0 Plan 04a will verify behavior.
+
+Note: Integration test file created in Plan 04a (Wave 0). This plan only modifies invoices.ts implementation.
 </objective>
 
 <execution_context>
@@ -89,38 +87,8 @@ export function createLogger(serviceName: string): {
 
 <tasks>
 
-<task type="auto" tdd="true">
-  <name>Task 1: Create invoice detail integration tests</name>
-  <files>services/bff-service/src/routes/invoices.integration.test.ts</files>
-  <behavior>
-    - Test 1: GET /api/invoices/:id returns invoice data with clientName and engagementDescription when all services are healthy
-    - Test 2: GET /api/invoices/:id returns invoice data with only clientName when engagement service fails
-    - Test 3: GET /api/invoices/:id returns invoice data without enrichment when both services fail
-    - Test 4: GET /api/invoices/:id returns HTTP 502 when billing service fails
-    - Test 5: GET /api/invoices/:id logs warnings for failed enrichment
-  </behavior>
-  <action>
-    Create integration test file using vitest and supertest. Mount invoicesRouter directly. Mock fetchJson to simulate:
-    - Billing service returning 200 with invoice data (including clientId, engagementId)
-    - Client service returning 200 with companyName
-    - Engagement service returning 200 with description
-    - Individual enrichment services failing (502, timeout)
-
-    Verify warning logs contain requestId and error details.
-
-    Import from services/bff-service/src/routes/invoices.ts: invoicesRouter
-    Import from services/bff-service/src/lib/service-client.ts: fetchJson (mock via vi.spyOn)
-    Use vi.spyOn on console.log to verify log entries
-
-  </action>
-  <verify>
-    <automated>pnpm --filter @shire/bff-service test:integration</automated>
-  </verify>
-  <done>Integration test file created with 5+ test cases covering error scenarios, tests pass after Task 2 implementation</done>
-</task>
-
 <task type="auto">
-  <name>Task 2: Refactor invoice detail route with Promise.allSettled</name>
+  <name>Task 1: Refactor invoice detail route with Promise.allSettled</name>
   <files>services/bff-service/src/routes/invoices.ts</files>
   <action>
     Refactor invoices.ts GET /:id route handler:
@@ -208,7 +176,7 @@ export function createLogger(serviceName: string): {
 </tasks>
 
 <verification>
-- Run integration tests: `pnpm --filter @shire/bff-service test:integration`
+- Run integration tests (created in Plan 04a): `pnpm --filter @shire/bff-service test:integration`
 - Verify no void async IIFE: `grep -r "void (async" services/bff-service/src/routes/invoices.ts` (should be empty)
 - Verify Promise.allSettled: `grep -q "Promise.allSettled" services/bff-service/src/routes/invoices.ts`
 - Verify async handler: `grep "router.get.*async.*=>" services/bff-service/src/routes/invoices.ts`
@@ -221,7 +189,7 @@ export function createLogger(serviceName: string): {
 3. Billing service failure returns HTTP 502 with "Billing service unavailable" message
 4. Client enrichment failure logs warning but doesn't prevent engagement enrichment
 5. Engagement enrichment failure logs warning independently of client enrichment
-6. Integration tests pass covering partial success scenarios
+6. Integration tests (created in Plan 04a) pass covering partial success scenarios
    </success_criteria>
 
 <output>

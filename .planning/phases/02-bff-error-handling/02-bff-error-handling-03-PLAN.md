@@ -3,9 +3,8 @@ phase: 02-bff-error-handling
 plan: 03
 type: execute
 wave: 2
-depends_on: []
+depends_on: ['02a']
 files_modified:
-  - services/bff-service/src/routes/engagements.integration.test.ts
   - services/bff-service/src/routes/engagements.ts
 autonomous: true
 requirements:
@@ -13,6 +12,7 @@ requirements:
   - ERR-02
   - ERR-03
   - ERR-04
+  - ERR-05
   - ERR-06
 
 must_haves:
@@ -23,9 +23,6 @@ must_haves:
     - 'Request ID is propagated to both engagement-service and client-service calls'
     - 'Engagement detail route handler uses async function (not void async IIFE)'
   artifacts:
-    - path: 'services/bff-service/src/routes/engagements.integration.test.ts'
-      provides: 'Integration tests for engagement detail error handling'
-      min_lines: 40
     - path: 'services/bff-service/src/routes/engagements.ts'
       provides: 'Refactored engagement detail route with proper error handling'
       exports: ['engagementsRouter']
@@ -46,9 +43,11 @@ Refactor engagement detail route to replace void async IIFE with top-level async
 
 Purpose: Engagement detail currently uses `void (async () => { ... })()` with an empty catch block around client enrichment. Errors are silently suppressed. This refactoring ensures client enrichment failures are logged as warnings with request ID.
 
-Output: Engagement detail route with async handler, try-catch with warning logs for enrichment failures, and integration tests.
+Output: Engagement detail route with async handler, try-catch with warning logs for enrichment failures. Integration tests created in Wave 0 Plan 02a will verify behavior.
 
-Note: Sequential enrichment pattern (fetch engagement first, then enrich client) is intentional and per CONTEXT.md locked decision. Do not parallelize.
+Note: Sequential enrichment pattern (fetch engagement first, then enrich client) is intentional and per CONTEXT.md locked decision. Do not parallelize. ERR-05 satisfied via per-service try-catch (sequential pattern is equivalent error handling).
+
+Note: Integration test file created in Plan 02a (Wave 0). This plan only modifies engagements.ts implementation.
 </objective>
 
 <execution_context>
@@ -90,37 +89,8 @@ export function createLogger(serviceName: string): {
 
 <tasks>
 
-<task type="auto" tdd="true">
-  <name>Task 1: Create engagement detail integration tests</name>
-  <files>services/bff-service/src/routes/engagements.integration.test.ts</files>
-  <behavior>
-    - Test 1: GET /api/engagements/:id returns engagement data with clientName when both services are healthy
-    - Test 2: GET /api/engagements/:id returns engagement data without clientName when client service fails
-    - Test 3: GET /api/engagements/:id returns HTTP 502 when engagement service fails
-    - Test 4: GET /api/engagements/:id logs warning for failed client enrichment
-    - Test 5: GET /api/engagements/:id propagates X-Request-Id to both services
-  </behavior>
-  <action>
-    Create integration test file using vitest and supertest. Mount engagementsRouter directly. Mock fetchJson to simulate:
-    - Engagement service returning 200 with engagement data (including clientId)
-    - Client service returning 200 with companyName
-    - Client service failing (502, timeout, network error)
-
-    Verify warning log contains requestId and error details for enrichment failures.
-
-    Import from services/bff-service/src/routes/engagements.ts: engagementsRouter
-    Import from services/bff-service/src/lib/service-client.ts: fetchJson (mock via vi.spyOn)
-    Use vi.spyOn on console.log to verify log entries
-
-  </action>
-  <verify>
-    <automated>pnpm --filter @shire/bff-service test:integration</automated>
-  </verify>
-  <done>Integration test file created with 5+ test cases covering error scenarios, tests pass after Task 2 implementation</done>
-</task>
-
 <task type="auto">
-  <name>Task 2: Refactor engagement detail route with logging</name>
+  <name>Task 1: Refactor engagement detail route with logging</name>
   <files>services/bff-service/src/routes/engagements.ts</files>
   <action>
     Refactor engagements.ts GET /:id route handler:
@@ -153,7 +123,7 @@ export function createLogger(serviceName: string): {
        ```typescript
        const engagement = engRes.data as Record<string, unknown>;
 
-       // Enrich with client name - best-effort but logged
+       // Enrich with client name - best-effort but logged (satisfies ERR-05)
        try {
          const clientRes = await fetchJson<{ companyName?: string }>(
            config.clientServiceUrl,
@@ -174,19 +144,19 @@ export function createLogger(serviceName: string): {
        }
        ```
 
-    Per CONTEXT.md locked decision: Sequential enrichment pattern is correct (client depends on engagement), enrichment failures logged as warnings, per-service try-catch blocks.
+    Per CONTEXT.md locked decision: Sequential enrichment pattern is correct (client depends on engagement), enrichment failures logged as warnings, per-service try-catch blocks. ERR-05 satisfied via individual service try-catch handling (sequential pattern equivalent to Promise.allSettled for error handling).
 
   </action>
   <verify>
     <automated>grep -q "router.get.*async" services/bff-service/src/routes/engagements.ts && grep -q "try {" services/bff-service/src/routes/engagements.ts</automated>
   </verify>
-  <done>Engagement detail route uses async handler with top-level try-catch, client enrichment failures logged as warnings with requestId, sequential pattern preserved</done>
+  <done>Engagement detail route uses async handler with top-level try-catch, client enrichment failures logged as warnings with requestId, sequential pattern preserved, ERR-05 satisfied via per-service error handling</done>
 </task>
 
 </tasks>
 
 <verification>
-- Run integration tests: `pnpm --filter @shire/bff-service test:integration`
+- Run integration tests (created in Plan 02a): `pnpm --filter @shire/bff-service test:integration`
 - Verify no void async IIFE: `grep -r "void (async" services/bff-service/src/routes/engagements.ts` (should be empty)
 - Verify async handler: `grep "router.get.*async.*=>" services/bff-service/src/routes/engagements.ts`
 - Verify warning log in enrichment catch block: `grep -A 10 "catch" services/bff-service/src/routes/engagements.ts | grep -q "log('warn'"`
@@ -196,10 +166,10 @@ export function createLogger(serviceName: string): {
 
 1. Engagement detail route handler is declared as async function
 2. Top-level try-catch catches all errors and returns HTTP 502 with "Engagement service unavailable" message
-3. Client enrichment failures are caught and logged as warnings with requestId and engagementId
+3. Client enrichment failures are caught and logged as warnings with requestId and engagementId (satisfies ERR-05 via per-service try-catch)
 4. Sequential pattern preserved (engagement fetched before client enrichment)
 5. Engagement data is returned even when client enrichment fails (best-effort pattern)
-6. Integration tests pass covering partial success and complete failure scenarios
+6. Integration tests (created in Plan 02a) pass covering partial success and complete failure scenarios
    </success_criteria>
 
 <output>

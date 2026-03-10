@@ -3,9 +3,8 @@ phase: 02-bff-error-handling
 plan: 02
 type: execute
 wave: 1
-depends_on: []
+depends_on: ['01a']
 files_modified:
-  - services/bff-service/src/routes/clients.integration.test.ts
   - services/bff-service/src/routes/clients.ts
 autonomous: true
 requirements:
@@ -24,9 +23,6 @@ must_haves:
     - 'Request ID is propagated to both client-service and engagement-service calls'
     - 'Client detail route handler uses async function (not void async IIFE)'
   artifacts:
-    - path: 'services/bff-service/src/routes/clients.integration.test.ts'
-      provides: 'Integration tests for client detail error handling'
-      min_lines: 40
     - path: 'services/bff-service/src/routes/clients.ts'
       provides: 'Refactored client detail route with proper error handling'
       exports: ['clientsRouter']
@@ -47,7 +43,9 @@ Refactor client detail route to replace void async IIFE with top-level async han
 
 Purpose: Client detail currently uses `void (async () => { ... })()` with `Promise.all` which fails entire request when engagement enrichment fails. This refactoring ensures engagement service failures are logged as warnings and don't prevent returning client data.
 
-Output: Client detail route with async handler, Promise.allSettled for partial success, warning logs for enrichment failures, and integration tests.
+Output: Client detail route with async handler, Promise.allSettled for partial success, warning logs for enrichment failures. Integration tests created in Wave 0 Plan 01a will verify behavior.
+
+Note: Integration test file created in Plan 01a (Wave 0). This plan only modifies clients.ts implementation.
 </objective>
 
 <execution_context>
@@ -89,37 +87,8 @@ export function createLogger(serviceName: string): {
 
 <tasks>
 
-<task type="auto" tdd="true">
-  <name>Task 1: Create client detail integration tests</name>
-  <files>services/bff-service/src/routes/clients.integration.test.ts</files>
-  <behavior>
-    - Test 1: GET /api/clients/:id returns client data with engagementCount when both services are healthy
-    - Test 2: GET /api/clients/:id returns client data with engagementCount: 0 when engagement service fails
-    - Test 3: GET /api/clients/:id returns HTTP 502 when client service fails
-    - Test 4: GET /api/clients/:id logs warning for failed engagement enrichment
-    - Test 5: GET /api/clients/:id propagates X-Request-Id to both services
-  </behavior>
-  <action>
-    Create integration test file using vitest and supertest. Mount clientsRouter directly. Mock fetchJson to simulate:
-    - Client service returning 200 with client data
-    - Engagement service returning 200 with total count
-    - Engagement service failing (502, timeout, network error)
-
-    Verify warning log contains requestId and error details for enrichment failures.
-
-    Import from services/bff-service/src/routes/clients.ts: clientsRouter
-    Import from services/bff-service/src/lib/service-client.ts: fetchJson (mock via vi.spyOn)
-    Use vi.spyOn on console.log to verify log entries
-
-  </action>
-  <verify>
-    <automated>pnpm --filter @shire/bff-service test:integration</automated>
-  </verify>
-  <done>Integration test file created with 5+ test cases covering error scenarios, tests pass after Task 2 implementation</done>
-</task>
-
 <task type="auto">
-  <name>Task 2: Refactor client detail route with Promise.allSettled</name>
+  <name>Task 1: Refactor client detail route with Promise.allSettled</name>
   <files>services/bff-service/src/routes/clients.ts</files>
   <action>
     Refactor clients.ts GET /:id route handler:
@@ -217,7 +186,7 @@ export function createLogger(serviceName: string): {
 </tasks>
 
 <verification>
-- Run integration tests: `pnpm --filter @shire/bff-service test:integration`
+- Run integration tests (created in Plan 01a): `pnpm --filter @shire/bff-service test:integration`
 - Verify no void async IIFE: `grep -r "void (async" services/bff-service/src/routes/clients.ts` (should be empty)
 - Verify Promise.allSettled: `grep -q "Promise.allSettled" services/bff-service/src/routes/clients.ts`
 - Verify async handler: `grep "router.get.*async.*=>" services/bff-service/src/routes/clients.ts`
@@ -230,7 +199,7 @@ export function createLogger(serviceName: string): {
 3. Client service failure returns HTTP 502 with "Client service unavailable" message
 4. Engagement service failure logs warning but returns client data with engagementCount: 0
 5. All error logs include requestId
-6. Integration tests pass covering partial success and complete failure scenarios
+6. Integration tests (created in Plan 01a) pass covering partial success and complete failure scenarios
    </success_criteria>
 
 <output>
