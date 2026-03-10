@@ -33,6 +33,7 @@ describe('checkActiveEngagements', () => {
   it('returns true when engagement-service returns at least one engagement for clientId', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
+      // eslint-disable-next-line @typescript-eslint/require-await -- mock matches Response API
       json: async () => ({ data: [{ _id: 'engagement-1', clientId: 'client-123' }] }),
     }) as any;
 
@@ -43,6 +44,7 @@ describe('checkActiveEngagements', () => {
   it('returns false when engagement-service returns empty array', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
+      // eslint-disable-next-line @typescript-eslint/require-await -- mock matches Response API
       json: async () => ({ data: [] }),
     }) as any;
 

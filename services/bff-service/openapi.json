@@ -19,7 +19,9 @@
   "paths": {
     "/health": {
       "get": {
-        "tags": ["Health"],
+        "tags": [
+          "Health"
+        ],
         "summary": "Health check",
         "responses": {
           "200": {
@@ -39,7 +41,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["status", "service", "timestamp"]
+                  "required": [
+                    "status",
+                    "service",
+                    "timestamp"
+                  ]
                 }
               }
             }

@@ -11,9 +11,7 @@ const { log } = createLogger(config.serviceName);
  *
  * Returns true if EITHER reports OR invoices exist for the engagement.
  */
-export async function checkAssociatedReportsOrInvoices(
-  engagementId: string,
-): Promise<boolean> {
+export async function checkAssociatedReportsOrInvoices(engagementId: string): Promise<boolean> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
 
@@ -52,15 +50,11 @@ export async function checkAssociatedReportsOrInvoices(
   return hasReports || hasInvoices;
 }
 
-async function checkReports(
-  engagementId: string,
-  signal: AbortSignal,
-): Promise<boolean> {
+async function checkReports(engagementId: string, signal: AbortSignal): Promise<boolean> {
   try {
-    const res = await fetch(
-      `${config.reportServiceUrl}/reports?engagementId=${engagementId}`,
-      { signal },
-    );
+    const res = await fetch(`${config.reportServiceUrl}/reports?engagementId=${engagementId}`, {
+      signal,
+    });
 
     if (!res.ok) {
       return false;
@@ -74,15 +68,11 @@ async function checkReports(
   }
 }
 
-async function checkInvoices(
-  engagementId: string,
-  signal: AbortSignal,
-): Promise<boolean> {
+async function checkInvoices(engagementId: string, signal: AbortSignal): Promise<boolean> {
   try {
-    const res = await fetch(
-      `${config.billingServiceUrl}/invoices?engagementId=${engagementId}`,
-      { signal },
-    );
+    const res = await fetch(`${config.billingServiceUrl}/invoices?engagementId=${engagementId}`, {
+      signal,
+    });
 
     if (!res.ok) {
       return false;

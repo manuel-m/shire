@@ -4,7 +4,7 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
   credentialsEncryptionKey:
     process.env.CREDENTIALS_ENCRYPTION_KEY || 'dev-encryption-key-change-me',
-  engagementServiceUrl:
-    process.env.ENGAGEMENT_SERVICE_URL || 'http://engagement-service:3003',
+  // eslint-disable-next-line sonarjs/no-clear-text-protocols -- internal Docker network
+  engagementServiceUrl: process.env.ENGAGEMENT_SERVICE_URL || 'http://engagement-service:3003',
   serviceName: 'client-service',
 } as const;

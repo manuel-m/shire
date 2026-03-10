@@ -10,3 +10,4 @@ export type GetHealth200 = {
   service: string;
   timestamp: string;
 };
+
