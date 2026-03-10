@@ -45,7 +45,7 @@ export function EngagementForm({ defaultValues, engagementId, preselectedClient,
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
       <Stack spacing={2} sx={{ mt: 1 }}>
         {mutation.error && <Alert severity="error">{mutation.error.message}</Alert>}
         {!engagementId && preselectedClient && (

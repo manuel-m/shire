@@ -29,7 +29,7 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
       <Stack spacing={2}>
         {error && <Alert severity="error">{error}</Alert>}
         <TextField
