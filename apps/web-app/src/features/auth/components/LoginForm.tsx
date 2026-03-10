@@ -29,7 +29,7 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={2}>
         {error && <Alert severity="error">{error}</Alert>}
         <TextField
