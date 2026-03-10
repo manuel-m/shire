@@ -8,7 +8,7 @@ Tasks
 
 webapp
 
-- [x] authentication.md.md
+- [x] authentication.md
 - [x] client-management.md
 - [x] engagement-management.md
 - [x] report-management.md
