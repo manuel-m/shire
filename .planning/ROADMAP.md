@@ -22,13 +22,14 @@
 **Requirements:** VAL-01, VAL-02, VAL-03, VAL-04, VAL-05, VAL-06, VAL-07
 
 **Success Criteria** (what must be TRUE):
+
 1. User cannot delete a client that has active engagements (receives 422 error with clear message)
 2. User cannot delete an engagement that has reports or invoices (receives 422 error with clear message)
 3. Validation failures are logged with request ID for distributed tracing
 4. Downstream service unavailability is handled gracefully (fails open, logs error)
 5. Validation requests timeout after 5 seconds to prevent hanging
 
-**Plans:** 2 plans
+**Plans:** 3/3 plans complete
 
 - [x] 01-cross-service-validation-01-PLAN.md — Implement client deletion validation (engagement-check.ts)
 - [x] 01-cross-service-validation-02-PLAN.md — Implement engagement deletion validation (report-invoice-check.ts)
@@ -44,6 +45,7 @@
 **Requirements:** ERR-01, ERR-02, ERR-03, ERR-04, ERR-05, ERR-06
 
 **Success Criteria** (what must be TRUE):
+
 1. BFF enrichment endpoints return HTTP 502 BAD_GATEWAY when downstream services fail
 2. All enrichment failures are logged with error details and request ID
 3. Individual service failures in parallel enrichment are handled without failing entire request
@@ -63,6 +65,7 @@
 **Requirements:** API-01, API-02, API-03, API-04, API-05, API-06, API-07
 
 **Success Criteria** (what must be TRUE):
+
 1. Every BFF route has a corresponding `.openapi.ts` registration file
 2. BFF `/openapi.json` endpoint returns a complete specification
 3. All request and response schemas are documented including error responses
@@ -82,6 +85,7 @@
 **Requirements:** GEN-01, GEN-02, GEN-03, GEN-04, FE-01, FE-02, FE-03, FE-04, FE-05, FE-06
 
 **Success Criteria** (what must be TRUE):
+
 1. Orval generates a complete TypeScript API client from BFF OpenAPI spec
 2. Generated client compiles without TypeScript errors
 3. Frontend imports and uses generated query and mutation hooks for all API calls
@@ -95,12 +99,12 @@
 
 ## Progress
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Cross-Service Validation | 2/2 | Complete | 2026-03-10 |
-| 2. BFF Error Handling | 0/0 | Not started | - |
-| 3. OpenAPI Registration | 0/0 | Not started | - |
-| 4. API Client Generation & Frontend Migration | 0/0 | Not started | - |
+| Phase                                         | Plans Complete | Status      | Completed  |
+| --------------------------------------------- | -------------- | ----------- | ---------- |
+| 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10 |
+| 2. BFF Error Handling                         | 0/0            | Not started | -          |
+| 3. OpenAPI Registration                       | 0/0            | Not started | -          |
+| 4. API Client Generation & Frontend Migration | 0/0            | Not started | -          |
 
 ---
 
@@ -123,6 +127,6 @@ Phase 1 (Cross-Service Validation) -- can run parallel to Phase 3
 
 ---
 
-*Roadmap created: 2026-03-10*
-*Phase 1 planned: 2026-03-10*
-*Phase 1 executed: 2026-03-10*
+_Roadmap created: 2026-03-10_
+_Phase 1 planned: 2026-03-10_
+_Phase 1 executed: 2026-03-10_
