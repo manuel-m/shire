@@ -416,7 +416,7 @@ describe('Credentials', () => {
 // ── Active engagements check ──────────────────────────────────────
 
 describe('Delete with active engagements', () => {
-  it('should return 409 when client has active engagements', async () => {
+  it('should return 422 when client has active engagements', async () => {
     const createRes = await request
       .post('/clients')
       .set('Authorization', `Bearer ${token}`)
@@ -428,7 +428,7 @@ describe('Delete with active engagements', () => {
     const res = await request
       .delete(`/clients/${createRes.body._id}`)
       .set('Authorization', `Bearer ${token}`);
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('ACTIVE_ENGAGEMENTS');
 
     spy.mockRestore();

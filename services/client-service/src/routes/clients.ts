@@ -149,7 +149,7 @@ clientsRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const hasActive = await engagementCheck.checkActiveEngagements(id);
   if (hasActive) {
-    res.status(409).json({
+    res.status(422).json({
       error: {
         code: 'ACTIVE_ENGAGEMENTS',
         message: 'Cannot delete client with active engagements',
