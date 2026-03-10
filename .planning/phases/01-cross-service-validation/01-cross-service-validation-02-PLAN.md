@@ -14,7 +14,7 @@ requirements: [VAL-02, VAL-03, VAL-04, VAL-05, VAL-06, VAL-07]
 must_haves:
   truths:
     - "User cannot delete an engagement that has reports or invoices"
-    - "Validation failures return HTTP 409 with HAS_ASSOCIATED_RECORDS error code"
+    - "Validation failures return HTTP 422 with HAS_ASSOCIATED_RECORDS error code"
     - "Validation failures are logged with request ID tracing"
     - "HTTP validation calls include 5-second timeout"
     - "Validation handles downstream service unavailability gracefully (fails open)"
@@ -95,7 +95,7 @@ engagementsRouter.delete('/:id', async (req: Request, res: Response) => {
 
   const hasAssociated = await reportInvoiceCheck.checkAssociatedReportsOrInvoices(id);
   if (hasAssociated) {
-    res.status(409).json({
+    res.status(422).json({
       error: {
         code: 'HAS_ASSOCIATED_RECORDS',
         message: 'Cannot delete engagement with associated reports or invoices',
@@ -150,7 +150,7 @@ engagementsRouter.delete('/:id', async (req: Request, res: Response) => {
 7. If both calls fail: return false (fail-open - allow deletion if we can't verify)
 8. DO NOT throw errors - always return boolean for graceful degradation
 
-Note: The current route uses HTTP 409 for HAS_ASSOCIATED_RECORDS. The validation function returns boolean; the route handler converts to HTTP response.</action>
+Note: The current route uses HTTP 422 for HAS_ASSOCIATED_RECORDS. The validation function returns boolean; the route handler converts to HTTP response.</action>
   <verify>
     <automated>pnpm --filter @shire/engagement-service type-check</automated>
     <automated>grep -q "AbortController" services/engagement-service/src/report-invoice-check.ts</automated>
@@ -167,7 +167,7 @@ Note: The current route uses HTTP 409 for HAS_ASSOCIATED_RECORDS. The validation
 2. Create a test engagement via POST /engagements (with valid clientId)
 3. Create a report for that engagement via POST /reports
 4. Attempt to delete the engagement via DELETE /engagements/{id}
-5. Expected: 409 Conflict with error code HAS_ASSOCIATED_RECORDS
+5. Expected: 422 Unprocessable Entity with error code HAS_ASSOCIATED_RECORDS
 6. Delete the report first, then delete engagement
 7. Expected: 204 No Content (delete succeeds)
 8. Verify billing-service validation works similarly
@@ -184,8 +184,8 @@ Integration tests already exist in services/engagement-service/src/routes/engage
 </verification>
 
 <success_criteria>
-1. Deleting an engagement with reports returns 409 with HAS_ASSOCIATED_RECORDS error code
-2. Deleting an engagement with invoices returns 409 with HAS_ASSOCIATED_RECORDS error code
+1. Deleting an engagement with reports returns 422 with HAS_ASSOCIATED_RECORDS error code
+2. Deleting an engagement with invoices returns 422 with HAS_ASSOCIATED_RECORDS error code
 3. Deleting an engagement without reports or invoices succeeds (204)
 4. HTTP calls timeout after 5 seconds
 5. Downstream service unavailability logs error and allows deletion (fail-open)

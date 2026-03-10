@@ -15,7 +15,7 @@ requirements: [VAL-01, VAL-03, VAL-04, VAL-05, VAL-06, VAL-07]
 must_haves:
   truths:
     - "User cannot delete a client that has active engagements"
-    - "Validation failures return HTTP 409 with ACTIVE_ENGAGEMENTS error code"
+    - "Validation failures return HTTP 422 with ACTIVE_ENGAGEMENTS error code"
     - "Validation failures are logged with request ID tracing"
     - "HTTP validation calls include 5-second timeout"
     - "Validation handles engagement-service unavailability gracefully (fails open)"
@@ -97,7 +97,7 @@ clientsRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const hasActive = await engagementCheck.checkActiveEngagements(id);
   if (hasActive) {
-    res.status(409).json({
+    res.status(422).json({
       error: {
         code: 'ACTIVE_ENGAGEMENTS',
         message: 'Cannot delete client with active engagements',
@@ -160,7 +160,7 @@ Follow the exact pattern from engagement-service/src/client-check.ts but for the
   <action>Create VALIDATION.md documenting cross-service validation architecture:
 1. Overview: HTTP-based validation between microservices over Docker network
 2. Validation pattern: check functions return boolean, route handlers convert to HTTP status codes
-3. Error codes: ACTIVE_ENGAGEMENTS (409), HAS_ASSOCIATED_RECORDS (409)
+3. Error codes: ACTIVE_ENGAGEMENTS (422), HAS_ASSOCIATED_RECORDS (422)
 4. Fail-open strategy: return false on errors to allow operations when dependent services are unavailable
 5. Timeouts: 5-second AbortController on all inter-service calls
 6. Logging: structured logs with request ID for tracing
@@ -182,7 +182,7 @@ Reference the implementation in engagement-check.ts and report-invoice-check.ts.
 2. Create a test client via POST /clients
 3. Create an engagement for that client via POST /engagements
 4. Attempt to delete the client via DELETE /clients/{id}
-5. Expected: 409 Conflict with error code ACTIVE_ENGAGEMENTS
+5. Expected: 422 Unprocessable Entity with error code ACTIVE_ENGAGEMENTS
 6. Delete the engagement first, then delete client
 7. Expected: 204 No Content (delete succeeds)
   </how-to-verify>
@@ -198,7 +198,7 @@ Integration tests already exist in services/client-service/src/routes/clients.in
 </verification>
 
 <success_criteria>
-1. Deleting a client with engagements returns 409 with ACTIVE_ENGAGEMENTS error code
+1. Deleting a client with engagements returns 422 with ACTIVE_ENGAGEMENTS error code
 2. Deleting a client without engagements succeeds (204)
 3. HTTP calls timeout after 5 seconds
 4. Engagement-service unavailability logs error and allows deletion (fail-open)
