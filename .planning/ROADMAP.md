@@ -28,7 +28,10 @@
 4. Downstream service unavailability is handled gracefully (fails open, logs error)
 5. Validation requests timeout after 5 seconds to prevent hanging
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+- [ ] 01-cross-service-validation-01-PLAN.md — Implement client deletion validation (engagement-check.ts)
+- [ ] 01-cross-service-validation-02-PLAN.md — Implement engagement deletion validation (report-invoice-check.ts)
 
 ---
 
@@ -79,7 +82,7 @@
 **Requirements:** GEN-01, GEN-02, GEN-03, GEN-04, FE-01, FE-02, FE-03, FE-04, FE-05, FE-06
 
 **Success Criteria** (what must be TRUE):
-1. Orval generates a complete TypeScript API client from the BFF OpenAPI spec
+1. Orval generates a complete TypeScript API client from BFF OpenAPI spec
 2. Generated client compiles without TypeScript errors
 3. Frontend imports and uses generated query and mutation hooks for all API calls
 4. Manual API files in `apps/web-app/src/features/*/api/*.ts` are removed
@@ -94,7 +97,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cross-Service Validation | 0/0 | Not started | - |
+| 1. Cross-Service Validation | 0/2 | Planning | - |
 | 2. BFF Error Handling | 0/0 | Not started | - |
 | 3. OpenAPI Registration | 0/0 | Not started | - |
 | 4. API Client Generation & Frontend Migration | 0/0 | Not started | - |
@@ -121,3 +124,4 @@ Phase 1 (Cross-Service Validation) -- can run parallel to Phase 3
 ---
 
 *Roadmap created: 2026-03-10*
+*Phase 1 planned: 2026-03-10*
