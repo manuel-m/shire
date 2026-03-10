@@ -6,7 +6,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Cross-Service Validation** - Fix stubbed validation to prevent data integrity violations
+- [x] **Phase 1: Cross-Service Validation** - Fix stubbed validation to prevent data integrity violations
 - [ ] **Phase 2: BFF Error Handling** - Replace void async pattern with proper error handling
 - [ ] **Phase 3: OpenAPI Registration** - Complete API documentation for all BFF routes
 - [ ] **Phase 4: API Client Generation & Frontend Migration** - Generate type-safe client and migrate frontend
@@ -97,7 +97,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cross-Service Validation | 2/2 | Awaiting Verification | - |
+| 1. Cross-Service Validation | 2/2 | Complete | 2026-03-10 |
 | 2. BFF Error Handling | 0/0 | Not started | - |
 | 3. OpenAPI Registration | 0/0 | Not started | - |
 | 4. API Client Generation & Frontend Migration | 0/0 | Not started | - |
