@@ -1,23 +1,26 @@
 ---
-status: diagnosed
+status: testing
 phase: 01-cross-service-validation
 source: [01-cross-service-validation-01-SUMMARY.md, 01-cross-service-validation-02-SUMMARY.md]
 started: 2026-03-10T00:00:00Z
-updated: 2026-03-10T12:05:00Z
+updated: 2026-03-10T17:30:00Z
 ---
 
 ## Current Test
 
-[testing blocked by issue]
+number: 1
+name: Delete Client with No Engagements
+expected: |
+Create a client. Attempt to delete it without creating any engagements.
+Expected: HTTP 204 No Content. Deletion succeeds immediately.
+awaiting: user response
 
 ## Tests
 
 ### 1. Delete Client with No Engagements
 
 expected: Create a client. Attempt to delete it without creating any engagements. Expected: HTTP 204 No Content. Deletion succeeds immediately.
-result: issue
-reported: "http://localhost:8888/clients/new is not working as expected. CREATE CLIENT action does not trigger new client creation"
-severity: blocker
+result: [pending]
 
 ### 2. Delete Client with Active Engagements
 
@@ -53,26 +56,14 @@ result: [pending]
 
 total: 7
 passed: 0
-issues: 1
-pending: 6
+issues: 0
+pending: 7
 skipped: 0
 
 ## Gaps
 
-- truth: "Client creation form at /clients/new successfully creates a new client"
-  status: failed
-  reason: "User reported: http://localhost:8888/clients/new is not working as expected. CREATE CLIENT action does not trigger new client creation"
-  severity: blocker
-  test: 1
-  root_cause: "Form onSubmit handler incorrectly wrapped in arrow function: `onSubmit={(e) => void handleSubmit(onSubmit)(e)}` breaks react-hook-form submission flow. Should be `onSubmit={handleSubmit(onSubmit)}`"
-  artifacts:
-  - path: "apps/web-app/src/features/clients/components/ClientForm.tsx"
-    issue: "Line 34: incorrect handleSubmit wrapping"
-  - path: "apps/web-app/src/features/engagements/components/EngagementForm.tsx"
-    issue: "Line 48: same handleSubmit bug"
-  - path: "apps/web-app/src/features/auth/components/LoginForm.tsx"
-    issue: "Line 32: same handleSubmit bug"
-    missing:
-  - "Fix onSubmit handlers in all three form components"
-  - "Rebuild web-app after fixes"
-    debug_session: ".planning/debug/client-creation-form-not-working.md"
+none
+
+## Notes
+
+Gap fix executed at 2026-03-10T17:26:00Z - form submission handlers fixed in ClientForm, EngagementForm, and LoginForm. Resuming UAT from test 1.

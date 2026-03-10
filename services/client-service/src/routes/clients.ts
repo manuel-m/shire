@@ -147,7 +147,8 @@ clientsRouter.put('/:id', async (req: Request, res: Response) => {
 // DELETE /clients/:id
 clientsRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const hasActive = await engagementCheck.checkActiveEngagements(id);
+  const authToken = (req.headers.authorization || '').replace('Bearer ', '');
+  const hasActive = await engagementCheck.checkActiveEngagements(id, authToken);
   if (hasActive) {
     res.status(422).json({
       error: {

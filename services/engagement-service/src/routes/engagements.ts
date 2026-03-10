@@ -217,8 +217,9 @@ engagementsRouter.patch('/:id/status', async (req: Request, res: Response) => {
 // DELETE /engagements/:id
 engagementsRouter.delete('/:id', async (req: Request, res: Response) => {
   const id = req.params.id as string;
+  const authToken = (req.headers.authorization || '').replace('Bearer ', '');
 
-  const hasAssociated = await reportInvoiceCheck.checkAssociatedReportsOrInvoices(id);
+  const hasAssociated = await reportInvoiceCheck.checkAssociatedReportsOrInvoices(id, authToken);
   if (hasAssociated) {
     res.status(422).json({
       error: {

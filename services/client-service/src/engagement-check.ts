@@ -8,13 +8,22 @@ const { log } = createLogger(config.serviceName);
  * Uses fail-open strategy: returns false on errors to allow operations
  * when dependent service is unavailable.
  */
-export async function checkActiveEngagements(clientId: string): Promise<boolean> {
+export async function checkActiveEngagements(
+  clientId: string,
+  authToken?: string,
+): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+    const headers: Record<string, string> = {};
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
     const res = await fetch(`${config.engagementServiceUrl}/engagements?clientId=${clientId}`, {
       signal: controller.signal,
+      headers,
     });
 
     clearTimeout(timeoutId);

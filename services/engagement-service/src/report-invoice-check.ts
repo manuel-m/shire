@@ -11,12 +11,15 @@ const { log } = createLogger(config.serviceName);
  *
  * Returns true if EITHER reports OR invoices exist for the engagement.
  */
-export async function checkAssociatedReportsOrInvoices(engagementId: string): Promise<boolean> {
+export async function checkAssociatedReportsOrInvoices(
+  engagementId: string,
+  authToken?: string,
+): Promise<boolean> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-  const reportCheck = checkReports(engagementId, controller.signal);
-  const billingCheck = checkInvoices(engagementId, controller.signal);
+  const reportCheck = checkReports(engagementId, controller.signal, authToken);
+  const billingCheck = checkInvoices(engagementId, controller.signal, authToken);
 
   const results = await Promise.allSettled([reportCheck, billingCheck]);
 
@@ -50,10 +53,20 @@ export async function checkAssociatedReportsOrInvoices(engagementId: string): Pr
   return hasReports || hasInvoices;
 }
 
-async function checkReports(engagementId: string, signal: AbortSignal): Promise<boolean> {
+async function checkReports(
+  engagementId: string,
+  signal: AbortSignal,
+  authToken?: string,
+): Promise<boolean> {
   try {
+    const headers: Record<string, string> = {};
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
     const res = await fetch(`${config.reportServiceUrl}/reports?engagementId=${engagementId}`, {
       signal,
+      headers,
     });
 
     if (!res.ok) {
@@ -68,10 +81,20 @@ async function checkReports(engagementId: string, signal: AbortSignal): Promise<
   }
 }
 
-async function checkInvoices(engagementId: string, signal: AbortSignal): Promise<boolean> {
+async function checkInvoices(
+  engagementId: string,
+  signal: AbortSignal,
+  authToken?: string,
+): Promise<boolean> {
   try {
+    const headers: Record<string, string> = {};
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
     const res = await fetch(`${config.billingServiceUrl}/invoices?engagementId=${engagementId}`, {
       signal,
+      headers,
     });
 
     if (!res.ok) {
