@@ -220,7 +220,7 @@ engagementsRouter.delete('/:id', async (req: Request, res: Response) => {
 
   const hasAssociated = await reportInvoiceCheck.checkAssociatedReportsOrInvoices(id);
   if (hasAssociated) {
-    res.status(409).json({
+    res.status(422).json({
       error: {
         code: 'HAS_ASSOCIATED_RECORDS',
         message: 'Cannot delete engagement with associated reports or invoices',
