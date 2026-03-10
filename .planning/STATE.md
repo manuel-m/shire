@@ -11,14 +11,14 @@
 
 ## Current Position
 
-**Phase:** Not started (roadmap created)
-**Plan:** TBD
-**Status:** Planning
-**Progress:** 0/4 phases complete
+**Phase:** 01 (Cross-Service Validation) — Wave 1 complete
+**Plan:** 01-01 and 01-02 complete
+**Status:** Awaiting verification
+**Progress:** 0/4 phases complete (2/2 plans complete in Phase 1)
 
 ```
 Phase: [----] 0%
-Phase 1: [----] 0% - Cross-Service Validation
+Phase 1: [███░] 75% - Cross-Service Validation (plans complete, pending verification)
 Phase 2: [----] 0% - BFF Error Handling
 Phase 3: [----] 0% - OpenAPI Registration
 Phase 4: [----] 0% - API Client Generation & Frontend Migration
@@ -35,6 +35,9 @@ No metrics yet. Milestone not started.
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-03-10 | Create 4-phase roadmap | Coarse granularity (3-5) required, combined GEN+FE into single phase due to tight coupling |
+| 2026-03-10 | Use HTTP 422 for validation failures | Follows RFC 4918 best practices for validation errors (per VAL-04 feedback) |
+| 2026-03-10 | Fail-open strategy for validation | Allows operations to proceed when dependent services unavailable, preventing cascading failures |
+| 2026-03-10 | 5-second AbortController timeout | Prevents route handlers from hanging indefinitely on slow services |
 
 ### Key Constraints
 
@@ -50,10 +53,11 @@ None currently.
 
 ### Active Todos
 
-1. Plan Phase 1: Cross-Service Validation
-2. Plan Phase 2: BFF Error Handling
-3. Plan Phase 3: OpenAPI Registration
-4. Plan Phase 4: API Client Generation & Frontend Migration
+1. ~~Plan Phase 1: Cross-Service Validation~~ — COMPLETE (2 plans executed)
+2. Verify Phase 1: Cross-Service Validation — PENDING (checkpoint verification)
+3. Plan Phase 2: BFF Error Handling
+4. Plan Phase 3: OpenAPI Registration
+5. Plan Phase 4: API Client Generation & Frontend Migration
 
 ### Research Notes
 
@@ -75,11 +79,16 @@ From research/SUMMARY.md:
 - All 28 v1 requirements mapped to phases
 - Granularity set to "coarse" (3-5 phases)
 - Dependencies established: Phase 4 depends on Phase 3; Phase 3 is independent
+- **Phase 1 execution complete:**
+  - 01-01: Client deletion validation with engagement-service HTTP check
+  - 01-02: Engagement deletion validation with parallel report/billing service checks
+  - Both plans use 5-second AbortController timeout and fail-open strategy
 
 ### Next Steps
 
-- Run `/gsd:plan-phase 1` to begin planning Cross-Service Validation
-- Phases 1, 2, and 3 can be planned and executed in parallel
+- Verify Phase 1 with `/gsd:verify-work 1` (checkpoint tasks pending)
+- After verification: run `/gsd:plan-phase 2` for BFF Error Handling
+- Phases 2 and 3 can be planned and executed in parallel
 
 ---
 
