@@ -431,7 +431,7 @@ describe('DELETE /engagements/:id', () => {
     const res = await request
       .delete(`/engagements/${createRes.body._id}`)
       .set('Authorization', `Bearer ${token}`);
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('HAS_ASSOCIATED_RECORDS');
 
     spy.mockRestore();
