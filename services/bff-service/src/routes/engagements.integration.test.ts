@@ -65,7 +65,7 @@ describe('GET /api/engagements/:id', () => {
 
   it('should return engagement data with clientName when both services are healthy (happy path)', async () => {
     let callCount = 0;
-    mockedFetchJson.mockImplementation((url, path, auth, reqId) => {
+    mockedFetchJson.mockImplementation((_url, _path, _auth, _reqId) => {
       callCount++;
       if (callCount === 1) {
         // First call: fetch engagement
@@ -106,7 +106,7 @@ describe('GET /api/engagements/:id', () => {
 
   it('should return engagement data without clientName when client service fails (partial success)', async () => {
     let callCount = 0;
-    mockedFetchJson.mockImplementation((url, path, auth, reqId) => {
+    mockedFetchJson.mockImplementation((_url, _path, _auth, _reqId) => {
       callCount++;
       if (callCount === 1) {
         // First call: fetch engagement successfully
@@ -170,9 +170,9 @@ describe('GET /api/engagements/:id', () => {
     const testRequestId = 'trace-456-xyz';
     const capturedRequestIds: string[] = [];
 
-    mockedFetchJson.mockImplementation((url, path, auth, requestId) => {
+    mockedFetchJson.mockImplementation((_url, path, _auth, requestId) => {
       capturedRequestIds.push(requestId);
-      if (url.includes('engagement-service')) {
+      if (path.includes('/engagements/')) {
         return Promise.resolve({
           status: 200,
           data: { id: engagementId, clientId: 'client-456', title: 'Test Engagement' },
@@ -198,7 +198,7 @@ describe('GET /api/engagements/:id', () => {
 
   it('should log warning for failed client enrichment with requestId', async () => {
     let callCount = 0;
-    mockedFetchJson.mockImplementation((url, path, auth, reqId) => {
+    mockedFetchJson.mockImplementation((_url, _path, _auth, _reqId) => {
       callCount++;
       if (callCount === 1) {
         // Engagement fetch succeeds
