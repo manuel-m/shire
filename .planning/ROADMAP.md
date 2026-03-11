@@ -64,7 +64,7 @@
 
 **Wave 1 (Implementation - Parallel):**
 
-- [ ] 02-bff-error-handling-01-PLAN.md — Refactor dashboard route with async handler and Promise.allSettled
+- [x] 02-bff-error-handling-01-PLAN.md — Refactor dashboard route with async handler and Promise.allSettled
 - [ ] 02-bff-error-handling-02-PLAN.md — Refactor client detail route with async handler and Promise.allSettled
 
 **Wave 2 (Implementation - Parallel):**
@@ -118,12 +118,12 @@
 
 ## Progress
 
-| Phase                                         | Plans Complete | Status      | Completed  |
-| --------------------------------------------- | -------------- | ----------- | ---------- |
-| 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10 |
-| 2. BFF Error Handling                         | 5/10           | Executing   | 2026-03-11 (Wave 0) |
-| 3. OpenAPI Registration                       | 0/0            | Not started | -          |
-| 4. API Client Generation & Frontend Migration | 0/0            | Not started | -          |
+| Phase                                         | Plans Complete | Status      | Completed             |
+| --------------------------------------------- | -------------- | ----------- | --------------------- |
+| 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10            |
+| 2. BFF Error Handling                         | 6/10           | Executing   | 2026-03-11 (Wave 0+1) |
+| 3. OpenAPI Registration                       | 0/0            | Not started | -                     |
+| 4. API Client Generation & Frontend Migration | 0/0            | Not started | -                     |
 
 ---
 
