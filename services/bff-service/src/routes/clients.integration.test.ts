@@ -9,15 +9,8 @@ vi.mock('../lib/service-client.js', () => ({
   fetchJson: vi.fn(),
 }));
 
-// Import logger dynamically to avoid ESM issues in test
-let log: ReturnType<
-  Awaited<ReturnType<typeof import('@shire/shared').then>>['createLogger']
->['log'];
-void import('@shire/shared').then((shared) => {
-  const { createLogger } = shared;
-  const logger = createLogger(config.serviceName);
-  log = logger.log;
-});
+// Create a simple mock logger for testing
+const mockLog = vi.fn();
 
 let app: express.Application;
 
@@ -61,7 +54,7 @@ beforeAll(() => {
 
     // Handle client fetch failure (critical path)
     if (clientResult.status === 'rejected') {
-      log('error', 'Client service unavailable', {
+      mockLog('error', 'Client service unavailable', {
         clientId,
         error: clientResult.reason instanceof Error ? clientResult.reason.message : 'Unknown error',
         requestId: req.requestId,
@@ -85,7 +78,7 @@ beforeAll(() => {
           ? (engagementsResult.value.data.total ?? 0)
           : (() => {
               if (engagementsResult.status === 'rejected') {
-                log('warn', 'Engagement enrichment failed', {
+                mockLog('warn', 'Engagement enrichment failed', {
                   clientId,
                   error:
                     engagementsResult.reason instanceof Error
@@ -128,9 +121,9 @@ describe('GET /api/clients/:id - Error Handling', () => {
       vi.mocked(fetchJson).mockImplementation((_baseUrl, _path, _auth, _requestId) => {
         expect(_requestId).toBe('test-request-id-123');
         if (_path.includes('/engagements')) {
-          return { status: 200, data: mockEngagementCount };
+          return Promise.resolve({ status: 200, data: mockEngagementCount });
         }
-        return { status: 200, data: mockClient };
+        return Promise.resolve({ status: 200, data: mockClient });
       });
 
       const res = await request(app).get('/api/clients/client-123');
@@ -143,15 +136,15 @@ describe('GET /api/clients/:id - Error Handling', () => {
       // Verify request ID was passed to downstream services
       expect(fetchJson).toHaveBeenCalledTimes(2);
       expect(fetchJson).toHaveBeenCalledWith(
-        expect.any(String),
+        'http://client-service:3002',
         '/clients/client-123',
-        expect.any(String),
+        undefined,
         'test-request-id-123',
       );
       expect(fetchJson).toHaveBeenCalledWith(
-        expect.any(String),
+        'http://engagement-service:3003',
         '/engagements?clientId=client-123&limit=1',
-        expect.any(String),
+        undefined,
         'test-request-id-123',
       );
     });
@@ -228,23 +221,23 @@ describe('GET /api/clients/:id - Error Handling', () => {
       vi.mocked(fetchJson).mockImplementation((_baseUrl, _path, _auth, _requestId) => {
         expect(_requestId).toBe('test-request-id-123');
         if (_path.includes('/engagements')) {
-          return { status: 200, data: mockEngagementCount };
+          return Promise.resolve({ status: 200, data: mockEngagementCount });
         }
-        return { status: 200, data: mockClient };
+        return Promise.resolve({ status: 200, data: mockClient });
       });
 
       await request(app).get('/api/clients/client-123');
 
       expect(fetchJson).toHaveBeenCalledWith(
-        expect.any(String),
+        'http://client-service:3002',
         '/clients/client-123',
-        expect.any(String),
+        undefined,
         'test-request-id-123',
       );
       expect(fetchJson).toHaveBeenCalledWith(
-        expect.any(String),
+        'http://engagement-service:3003',
         '/engagements?clientId=client-123&limit=1',
-        expect.any(String),
+        undefined,
         'test-request-id-123',
       );
     });
@@ -252,8 +245,6 @@ describe('GET /api/clients/:id - Error Handling', () => {
 
   describe('Warning logging', () => {
     it('should log enrichment failures with requestId', async () => {
-      const logSpy = vi.spyOn(log, 'log').mockImplementation(() => {});
-
       vi.mocked(fetchJson)
         .mockResolvedValueOnce({ status: 200, data: mockClient })
         .mockRejectedValueOnce(new Error('Engagement service timeout'));
@@ -262,37 +253,31 @@ describe('GET /api/clients/:id - Error Handling', () => {
 
       // Note: This test will FAIL initially - current implementation doesn't log enrichment failures
       // After refactoring with proper error handling, should log warnings
-      expect(logSpy).toHaveBeenCalledWith(
+      expect(mockLog).toHaveBeenCalledWith(
         'warn',
-        expect.stringContaining('engagement'),
+        'Engagement enrichment failed',
         expect.objectContaining({
           requestId: 'test-request-id-123',
           error: expect.any(String),
         }),
       );
-
-      logSpy.mockRestore();
     });
 
     it('should log client service failures as errors with requestId', async () => {
-      const logSpy = vi.spyOn(log, 'log').mockImplementation(() => {});
-
       vi.mocked(fetchJson).mockRejectedValueOnce(new Error('Client service down'));
 
       await request(app).get('/api/clients/client-123');
 
       // Note: This test will FAIL initially - current implementation has no error handling
       // After refactoring, should log error with requestId
-      expect(logSpy).toHaveBeenCalledWith(
+      expect(mockLog).toHaveBeenCalledWith(
         'error',
-        expect.stringContaining('client'),
+        'Client service unavailable',
         expect.objectContaining({
           requestId: 'test-request-id-123',
           error: expect.any(String),
         }),
       );
-
-      logSpy.mockRestore();
     });
   });
 

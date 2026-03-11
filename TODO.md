@@ -1,10 +1,6 @@
 Tasks
 
-/clear
-/gsd:execute-phase 01 --gaps-only
-
-/gsd:verify-work 1
-/gsd:plan-phase 2
+/gsd:execute-phase 3
 
 webapp
 

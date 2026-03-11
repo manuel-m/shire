@@ -25,7 +25,8 @@ vi.mock('../config.js', () => ({
 
 // Mock createLogger from @shire/shared
 vi.mock('@shire/shared', async (importOriginal) => {
-  const actual = await importOriginal();
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
     createLogger: vi.fn(() => ({
@@ -39,6 +40,9 @@ vi.mock('@shire/shared', async (importOriginal) => {
     })),
   };
 });
+
+// Import the requestId middleware from @shire/shared for test setup
+import { requestId } from '@shire/shared';
 
 // Mock fetchJson to control service responses
 vi.mock('../lib/service-client.js', () => ({
@@ -54,6 +58,7 @@ beforeEach(() => {
 function createTestApp() {
   const app = express();
   app.use(express.json());
+  app.use(requestId);
   app.use('/api/engagements', engagementsRouter);
   return app;
 }
@@ -73,13 +78,12 @@ describe('GET /api/engagements/:id', () => {
           status: 200,
           data: { id: engagementId, clientId: 'client-456', title: 'Test Engagement' },
         });
-      } else {
-        // Second call: enrich with client name
-        return Promise.resolve({
-          status: 200,
-          data: { companyName: 'Test Client Corp' },
-        });
       }
+      // Second call: enrich with client name
+      return Promise.resolve({
+        status: 200,
+        data: { companyName: 'Test Client Corp' },
+      });
     });
 
     const app = createTestApp();
@@ -114,10 +118,9 @@ describe('GET /api/engagements/:id', () => {
           status: 200,
           data: { id: engagementId, clientId: 'client-456', title: 'Test Engagement' },
         });
-      } else {
-        // Second call: client enrichment fails
-        return Promise.reject(new Error('Client service unavailable'));
       }
+      // Second call: client enrichment fails
+      return Promise.reject(new Error('Client service unavailable'));
     });
 
     const app = createTestApp();
@@ -177,12 +180,11 @@ describe('GET /api/engagements/:id', () => {
           status: 200,
           data: { id: engagementId, clientId: 'client-456', title: 'Test Engagement' },
         });
-      } else {
-        return Promise.resolve({
-          status: 200,
-          data: { companyName: 'Test Client Corp' },
-        });
       }
+      return Promise.resolve({
+        status: 200,
+        data: { companyName: 'Test Client Corp' },
+      });
     });
 
     const app = createTestApp();
@@ -206,10 +208,9 @@ describe('GET /api/engagements/:id', () => {
           status: 200,
           data: { id: engagementId, clientId: 'client-456', title: 'Test Engagement' },
         });
-      } else {
-        // Client enrichment fails with specific error
-        return Promise.reject(new Error('ECONNREFUSED: Connection refused'));
       }
+      // Client enrichment fails with specific error
+      return Promise.reject(new Error('ECONNREFUSED: Connection refused'));
     });
 
     const app = createTestApp();

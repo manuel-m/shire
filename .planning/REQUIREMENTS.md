@@ -9,13 +9,13 @@ Requirements for this tech debt cleanup milestone. Each maps to roadmap phases.
 
 ### Cross-Service Validation
 
-- [ ] **VAL-01**: Client deletion validates no active engagements exist before allowing delete
-- [ ] **VAL-02**: Engagement deletion validates no reports or invoices exist before allowing delete
-- [ ] **VAL-03**: Validation uses synchronous HTTP calls to downstream services
-- [ ] **VAL-04**: Validation failures return HTTP 422 with clear error codes
-- [ ] **VAL-05**: Validation failures are logged with request ID tracing
-- [ ] **VAL-06**: HTTP validation calls include timeout (5 seconds)
-- [ ] **VAL-07**: Validation handles downstream service unavailability gracefully (fail-open)
+- [x] **VAL-01**: Client deletion validates no active engagements exist before allowing delete
+- [x] **VAL-02**: Engagement deletion validates no reports or invoices exist before allowing delete
+- [x] **VAL-03**: Validation uses synchronous HTTP calls to downstream services
+- [x] **VAL-04**: Validation failures return HTTP 422 with clear error codes
+- [x] **VAL-05**: Validation failures are logged with request ID tracing
+- [x] **VAL-06**: HTTP validation calls include timeout (5 seconds)
+- [x] **VAL-07**: Validation handles downstream service unavailability gracefully (fail-open)
 
 ### BFF Error Handling
 
@@ -88,13 +88,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase   | Status   |
 | ----------- | ------- | -------- |
-| VAL-01      | Phase 1 | Pending  |
-| VAL-02      | Phase 1 | Pending  |
-| VAL-03      | Phase 1 | Pending  |
-| VAL-04      | Phase 1 | Pending  |
-| VAL-05      | Phase 1 | Pending  |
-| VAL-06      | Phase 1 | Pending  |
-| VAL-07      | Phase 1 | Pending  |
+| VAL-01      | Phase 1 | Complete |
+| VAL-02      | Phase 1 | Complete |
+| VAL-03      | Phase 1 | Complete |
+| VAL-04      | Phase 1 | Complete |
+| VAL-05      | Phase 1 | Complete |
+| VAL-06      | Phase 1 | Complete |
+| VAL-07      | Phase 1 | Complete |
 | ERR-01      | Phase 2 | Complete |
 | ERR-02      | Phase 2 | Complete |
 | ERR-03      | Phase 2 | Complete |

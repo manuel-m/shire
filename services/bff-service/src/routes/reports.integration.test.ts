@@ -142,7 +142,7 @@ describe('GET /api/reports/:id - error handling', () => {
           return Promise.resolve({ status: 200, data: { companyName: mockClient.companyName } });
         }
         // Engagement service call fails
-        throw new Error('Engagement service unavailable');
+        return Promise.reject(new Error('Engagement service unavailable'));
       });
 
       const app = createTestApp();
@@ -168,7 +168,7 @@ describe('GET /api/reports/:id - error handling', () => {
         }
         if (callCount === 2) {
           // Client service call fails
-          throw new Error('Client service unavailable');
+          return Promise.reject(new Error('Client service unavailable'));
         }
         // Engagement service call succeeds
         return Promise.resolve({ status: 200, data: { description: mockEngagement.description } });
@@ -196,7 +196,7 @@ describe('GET /api/reports/:id - error handling', () => {
           return Promise.resolve({ status: 200, data: { ...mockReport } });
         }
         // Both enrichment services fail
-        throw new Error('Service unavailable');
+        return Promise.reject(new Error('Service unavailable'));
       });
 
       const app = createTestApp();

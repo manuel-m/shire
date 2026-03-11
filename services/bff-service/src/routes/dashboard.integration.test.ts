@@ -25,7 +25,8 @@ vi.mock('../config.js', () => ({
 
 // Mock the createLogger from @shire/shared
 vi.mock('@shire/shared', async (importOriginal) => {
-  const actual = await importOriginal();
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
     createLogger: vi.fn(() => ({
