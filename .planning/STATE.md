@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: '2026-03-11T12:40:00.000Z'
+last_updated: '2026-03-11T13:55:00.000Z'
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 13
-  completed_plans: 9
-  percent: 69
+  completed_plans: 10
+  percent: 77
 ---
 
 # State: Tech Debt Cleanup
@@ -26,14 +26,14 @@ progress:
 ## Current Position
 
 **Phase:** 02 (BFF Error Handling) — Wave 1 in progress
-**Plan:** 02-bff-error-handling-01 complete (dashboard route refactoring)
+**Plan:** 02-bff-error-handling-03 complete (engagements route refactoring)
 **Status:** Executing
-**Progress:** [████████░░] 69%
+**Progress:** [████████░] 77%
 
 ```
-Phase: [████████░] 69%
+Phase: [████████░] 77%
 Phase 1: [████] 100% - Cross-Service Validation (complete)
-Phase 2: [███████] 40% - BFF Error Handling (Plans 00, 01a, 02a, 01 complete; 02, 03, 04 pending)
+Phase 2: [███████] 50% - BFF Error Handling (Plans 00, 01a, 02a, 01, 03 complete; 02, 04 pending)
 Phase 3: [----] 0% - OpenAPI Registration
 Phase 4: [----] 0% - API Client Generation & Frontend Migration
 ```
@@ -46,6 +46,7 @@ Phase 4: [----] 0% - API Client Generation & Frontend Migration
 | 02-bff-error-handling | 01a  | 15m      | 1     | 2     |
 | 02-bff-error-handling | 02a  | 5m       | 1     | 1     |
 | 02-bff-error-handling | 01   | 5m       | 1     | 1     |
+| 02-bff-error-handling | 03   | 5m       | 1     | 1     |
 
 ## Accumulated Context
 
@@ -77,7 +78,7 @@ None currently.
 
 1. ~~Plan Phase 1: Cross-Service Validation~~ — COMPLETE (2 plans executed)
 2. Verify Phase 1: Cross-Service Validation — PENDING (checkpoint verification)
-3. Execute Phase 2: BFF Error Handling — IN PROGRESS (Plans 00, 01a, 02a, 01 complete; 02, 03, 04 pending)
+3. Execute Phase 2: BFF Error Handling — IN PROGRESS (Plans 00, 01a, 02a, 01, 03 complete; 02, 04 pending)
 4. Plan Phase 3: OpenAPI Registration
 5. Plan Phase 4: API Client Generation & Frontend Migration
 
@@ -109,17 +110,15 @@ From research/SUMMARY.md:
   - Both plans use 5-second AbortController timeout and fail-open strategy
 - **Phase 2 execution in progress:**
   - Wave 0 (plans 00, 01a, 02a): Test scaffolds created for dashboard, clients, engagements
-  - Wave 1 (plan 01): Dashboard route refactored with proper error handling
-    - Replaced void async IIFE with top-level async handler
-    - Added try-catch with HTTP 502 on errors
-    - Service name constants for consistent error messages
-    - Warning logs for enrichment failures with requestId
-    - All 7 fetchJson calls propagate requestId
-    - Integration tests passing (6/6)
+  - Wave 1 (plans 01, 03): Dashboard and engagements routes refactored with proper error handling
+    - Dashboard: Replaced void async IIFE with top-level async handler, added try-catch with HTTP 502, service name constants for consistent error messages, warning logs for enrichment failures with requestId, all 7 fetchJson calls propagate requestId, integration tests passing (6/6)
+    - Engagements: Replaced void async IIFE with top-level async handler, added try-catch with HTTP 502, warning logs for client enrichment failures with requestId, sequential enrichment pattern preserved (fetch engagement then enrich), request ID propagated to both service calls
+    - Note: Engagements integration test has bug (missing requestId middleware in test setup) - test scaffolding issue from Plan 02a
 
 ### Next Steps
 
-- Continue Phase 2 Wave 1: Execute plans 02, 03, 04 for clients, engagements, reports, invoices routes
+- Continue Phase 2 Wave 1: Execute plans 02, 04 for clients, reports, invoices routes
+- Fix engagements integration test scaffolding (add requestId middleware to test app)
 - Verify Phase 1 with `/gsd:verify-work 1` (checkpoint tasks pending)
 - Phase 2 and 3 can be planned and executed in parallel
 
