@@ -7,7 +7,7 @@
 ## Phases
 
 - [x] **Phase 1: Cross-Service Validation** - Fix stubbed validation to prevent data integrity violations
-- [ ] **Phase 2: BFF Error Handling** - Replace void async pattern with proper error handling
+- [x] **Phase 2: BFF Error Handling** - Replace void async pattern with proper error handling (completed 2026-03-11)
 - [ ] **Phase 3: OpenAPI Registration** - Complete API documentation for all BFF routes
 - [ ] **Phase 4: API Client Generation & Frontend Migration** - Generate type-safe client and migrate frontend
 
@@ -52,7 +52,7 @@
 4. Request ID is propagated to all downstream service calls
 5. No void async IIFE patterns exist in BFF route handlers
 
-**Plans:** 10 plans (5 Wave 0 + 5 Wave 1/2)
+**Plans:** 10/10 plans complete
 
 **Wave 0 (Test Infrastructure):**
 
@@ -118,12 +118,12 @@
 
 ## Progress
 
-| Phase                                         | Plans Complete | Status      | Completed             |
-| --------------------------------------------- | -------------- | ----------- | --------------------- |
-| 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10            |
-| 2. BFF Error Handling                         | 8/10           | Executing   | 2026-03-11 (Wave 0-2) |
-| 3. OpenAPI Registration                       | 0/0            | Not started | -                     |
-| 4. API Client Generation & Frontend Migration | 0/0            | Not started | -                     |
+| Phase                                         | Plans Complete | Status      | Completed  |
+| --------------------------------------------- | -------------- | ----------- | ---------- |
+| 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10 |
+| 2. BFF Error Handling                         | 8/10           | Complete    | 2026-03-11 |
+| 3. OpenAPI Registration                       | 0/0            | Not started | -          |
+| 4. API Client Generation & Frontend Migration | 0/0            | Not started | -          |
 
 ---
 
