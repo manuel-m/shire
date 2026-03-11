@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import supertest from 'supertest';
 import express from 'express';
-import { reportsRouter } from './reports.js';
 
-// Mock logger - create outside mock factory so it can be inspected in tests
-const mockLog = vi.fn();
+// Use vi.hoisted to create variables that can be referenced in mock factories
+const { mockLog } = vi.hoisted(() => {
+  return {
+    mockLog: vi.fn(),
+  };
+});
 
 // Mock config
 vi.mock('../config.js', () => ({
@@ -42,8 +45,10 @@ vi.mock('../lib/service-client.js', () => ({
   proxyRequest: vi.fn(),
 }));
 
-// Import the mocked functions after mocking the module
+// Import reportsRouter, requestId middleware, and mocked functions after mocking the module
+import { reportsRouter } from './reports.js';
 import { fetchJson, proxyRequest } from '../lib/service-client.js';
+import { requestId } from '@shire/shared';
 
 const mockedFetchJson = fetchJson as ReturnType<typeof vi.fn>;
 const mockedProxyRequest = proxyRequest as ReturnType<typeof vi.fn>;
@@ -55,6 +60,7 @@ beforeEach(() => {
 function createTestApp() {
   const app = express();
   app.use(express.json());
+  app.use(requestId);
   app.use('/api/reports', reportsRouter);
   return app;
 }
@@ -353,7 +359,7 @@ describe('GET /api/reports/:id - error handling', () => {
 describe('GET /api/reports - simple proxy', () => {
   it('should proxy requests to report service', async () => {
     mockedProxyRequest.mockImplementation((_baseUrl, _path, _req, res) => {
-      (res as any).status(200).json([{ _id: 'report-1', title: 'Report 1' }]);
+      res.status(200).json([{ _id: 'report-1', title: 'Report 1' }]);
     });
 
     const app = createTestApp();
@@ -369,7 +375,7 @@ describe('GET /api/reports - simple proxy', () => {
 describe('POST /api/reports', () => {
   it('should proxy requests to report service', async () => {
     mockedProxyRequest.mockImplementation((_baseUrl, _path, _req, res) => {
-      (res as any).status(201).json({ _id: 'new-report', title: 'New Report' });
+      res.status(201).json({ _id: 'new-report', title: 'New Report' });
     });
 
     const app = createTestApp();
@@ -385,7 +391,7 @@ describe('POST /api/reports', () => {
 describe('PUT /api/reports/:id', () => {
   it('should proxy requests to report service', async () => {
     mockedProxyRequest.mockImplementation((_baseUrl, _path, _req, res) => {
-      (res as any).status(200).json({ _id: 'report-123', title: 'Updated' });
+      res.status(200).json({ _id: 'report-123', title: 'Updated' });
     });
 
     const app = createTestApp();
