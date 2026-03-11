@@ -2,7 +2,7 @@
 
 **Project:** Shire Tech Debt Cleanup - Cross-Service Validation, BFF Error Handling, API Client Generation
 **Granularity:** Coarse (3-5 phases)
-**Last Updated:** 2026-03-10
+**Last Updated:** 2026-03-11
 
 ## Phases
 
@@ -56,11 +56,11 @@
 
 **Wave 0 (Test Infrastructure):**
 
-- [ ] 02-bff-error-handling-00-PLAN.md — Create dashboard integration test scaffold
-- [ ] 02-bff-error-handling-01a-PLAN.md — Create client detail integration test scaffold
-- [ ] 02-bff-error-handling-02a-PLAN.md — Create engagement detail integration test scaffold
-- [ ] 02-bff-error-handling-03a-PLAN.md — Create report detail integration test scaffold
-- [ ] 02-bff-error-handling-04a-PLAN.md — Create invoice detail integration test scaffold
+- [x] 02-bff-error-handling-00-PLAN.md — Create dashboard integration test scaffold
+- [x] 02-bff-error-handling-01a-PLAN.md — Create client detail integration test scaffold
+- [x] 02-bff-error-handling-02a-PLAN.md — Create engagement detail integration test scaffold
+- [x] 02-bff-error-handling-03a-PLAN.md — Create report detail integration test scaffold
+- [x] 02-bff-error-handling-04a-PLAN.md — Create invoice detail integration test scaffold
 
 **Wave 1 (Implementation - Parallel):**
 

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: '2026-03-10T16:27:19.560Z'
+status: executing
+last_updated: '2026-03-11T06:30:00.000Z'
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 13
+  completed_plans: 5
+  percent: 38
 ---
 
 # State: Tech Debt Cleanup
@@ -25,22 +25,24 @@ progress:
 
 ## Current Position
 
-**Phase:** 01 (Cross-Service Validation) — Wave 1 complete
-**Plan:** 01-01 and 01-02 complete
-**Status:** Ready to plan
-**Progress:** [██████████] 100%
+**Phase:** 02 (BFF Error Handling) — Wave 0 complete
+**Plan:** 02-bff-error-handling-04a complete (invoice test scaffold)
+**Status:** Executing
+**Progress:** [█████░░░░] 38%
 
 ```
-Phase: [----] 0%
-Phase 1: [███░] 75% - Cross-Service Validation (plans complete, pending verification)
-Phase 2: [----] 0% - BFF Error Handling
+Phase: [█████░] 38%
+Phase 1: [████] 100% - Cross-Service Validation (complete)
+Phase 2: [███░] 15% - BFF Error Handling (Plans 00-04a complete)
 Phase 3: [----] 0% - OpenAPI Registration
 Phase 4: [----] 0% - API Client Generation & Frontend Migration
 ```
 
 ## Performance Metrics
 
-No metrics yet. Milestone not started.
+| Phase | Plan | Duration | Tasks | Files |
+| ----- | ---- | -------- | ----- | ----- |
+| 02-bff-error-handling | 00 | 128s | 1 | 1 |
 
 ## Accumulated Context
 
@@ -70,7 +72,7 @@ None currently.
 
 1. ~~Plan Phase 1: Cross-Service Validation~~ — COMPLETE (2 plans executed)
 2. Verify Phase 1: Cross-Service Validation — PENDING (checkpoint verification)
-3. Plan Phase 2: BFF Error Handling
+3. Execute Phase 2: BFF Error Handling — IN PROGRESS (Plan 00 complete, Wave 0 scaffolding done)
 4. Plan Phase 3: OpenAPI Registration
 5. Plan Phase 4: API Client Generation & Frontend Migration
 
@@ -100,6 +102,10 @@ From research/SUMMARY.md:
   - 01-01: Client deletion validation with engagement-service HTTP check
   - 01-02: Engagement deletion validation with parallel report/billing service checks
   - Both plans use 5-second AbortController timeout and fail-open strategy
+- **Phase 2 Wave 0 execution:**
+  - 02-00: Dashboard test scaffold created
+  - 02-01 through 02-04a: Integration test scaffolds created for clients, engagements, reports, and invoices routes
+  - All test files follow vitest + supertest conventions with comprehensive error scenario coverage
 
 ### Next Steps
 
