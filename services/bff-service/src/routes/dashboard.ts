@@ -62,6 +62,12 @@ dashboardRouter.get('/', async (req: Request, res: Response) => {
       ),
     ]);
 
+    // Service name constants for logging
+    const CLIENT_SERVICE = 'Client service';
+    const ENGAGEMENT_SERVICE = 'Engagement service';
+    const REPORT_SERVICE = 'Report service';
+    const BILLING_SERVICE = 'Billing service';
+
     // Check if all services failed
     const allFailed = results.every(
       (r) => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.status !== 200),
@@ -91,16 +97,14 @@ dashboardRouter.get('/', async (req: Request, res: Response) => {
       return 0;
     };
 
-    const billingServiceName = 'Billing service';
-
     const dashboard = {
-      totalClients: extract(results[0], 'Client service'),
-      totalEngagements: extract(results[1], 'Engagement service'),
-      totalReports: extract(results[2], 'Report service'),
-      totalInvoices: extract(results[3], billingServiceName),
-      activeEngagements: extract(results[4], 'Engagement service'),
-      draftInvoices: extract(results[5], billingServiceName),
-      overdueInvoices: extract(results[6], billingServiceName),
+      totalClients: extract(results[0], CLIENT_SERVICE),
+      totalEngagements: extract(results[1], ENGAGEMENT_SERVICE),
+      totalReports: extract(results[2], REPORT_SERVICE),
+      totalInvoices: extract(results[3], BILLING_SERVICE),
+      activeEngagements: extract(results[4], ENGAGEMENT_SERVICE),
+      draftInvoices: extract(results[5], BILLING_SERVICE),
+      overdueInvoices: extract(results[6], BILLING_SERVICE),
     };
 
     log('info', 'Dashboard aggregated', { requestId: req.requestId });
