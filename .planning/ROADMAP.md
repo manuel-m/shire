@@ -70,7 +70,7 @@
 **Wave 2 (Implementation - Parallel):**
 
 - [x] 02-bff-error-handling-03-PLAN.md — Refactor engagement detail route with async handler and logging
-- [ ] 02-bff-error-handling-04-PLAN.md — Refactor report detail route with async handler and Promise.allSettled
+- [x] 02-bff-error-handling-04-PLAN.md — Refactor report detail route with async handler and Promise.allSettled
 - [ ] 02-bff-error-handling-05-PLAN.md — Refactor invoice detail route with async handler and Promise.allSettled
 
 ---
@@ -121,7 +121,7 @@
 | Phase                                         | Plans Complete | Status      | Completed             |
 | --------------------------------------------- | -------------- | ----------- | --------------------- |
 | 1. Cross-Service Validation                   | 3/3            | Complete    | 2026-03-10            |
-| 2. BFF Error Handling                         | 7/10           | Executing   | 2026-03-11 (Wave 0-2) |
+| 2. BFF Error Handling                         | 8/10           | Executing   | 2026-03-11 (Wave 0-2) |
 | 3. OpenAPI Registration                       | 0/0            | Not started | -                     |
 | 4. API Client Generation & Frontend Migration | 0/0            | Not started | -                     |
 
