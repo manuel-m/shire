@@ -24,11 +24,9 @@ describe('report-invoice-check', () => {
 
     global.fetch = vi.fn((url: string) => {
       if (url.includes(':3004')) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- mock return
         return mockReportFetch(url);
       }
       if (url.includes(':3005')) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- mock return
         return mockBillingFetch(url);
       }
       return Promise.reject(new Error(`Unexpected URL: ${url}`));
