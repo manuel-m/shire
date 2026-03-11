@@ -19,11 +19,11 @@ Requirements for this tech debt cleanup milestone. Each maps to roadmap phases.
 
 ### BFF Error Handling
 
-- [ ] **ERR-01**: All BFF enrichment endpoints use top-level async handlers (no void async IIFE)
-- [ ] **ERR-02**: All BFF handlers have try-catch error handling
+- [x] **ERR-01**: All BFF enrichment endpoints use top-level async handlers (no void async IIFE)
+- [x] **ERR-02**: All BFF handlers have try-catch error handling
 - [x] **ERR-03**: Failed enrichment attempts are logged with error details
 - [x] **ERR-04**: Service failures return HTTP 502 BAD_GATEWAY with error response
-- [ ] **ERR-05**: Individual service failures are handled gracefully (either via `Promise.allSettled` for parallel enrichment, or per-service try-catch blocks for sequential enrichment)
+- [x] **ERR-05**: Individual service failures are handled gracefully (either via `Promise.allSettled` for parallel enrichment, or per-service try-catch blocks for sequential enrichment)
 - [x] **ERR-06**: Request ID propagated to all downstream service calls
 
 ### OpenAPI Registration
@@ -86,38 +86,38 @@ Explicitly excluded. Documented to prevent scope creep.
 
 Which phases cover which requirements. Updated during roadmap creation.
 
-| Requirement | Phase   | Status  |
-| ----------- | ------- | ------- |
-| VAL-01      | Phase 1 | Pending |
-| VAL-02      | Phase 1 | Pending |
-| VAL-03      | Phase 1 | Pending |
-| VAL-04      | Phase 1 | Pending |
-| VAL-05      | Phase 1 | Pending |
-| VAL-06      | Phase 1 | Pending |
-| VAL-07      | Phase 1 | Pending |
-| ERR-01      | Phase 2 | Pending |
-| ERR-02      | Phase 2 | Pending |
+| Requirement | Phase   | Status   |
+| ----------- | ------- | -------- |
+| VAL-01      | Phase 1 | Pending  |
+| VAL-02      | Phase 1 | Pending  |
+| VAL-03      | Phase 1 | Pending  |
+| VAL-04      | Phase 1 | Pending  |
+| VAL-05      | Phase 1 | Pending  |
+| VAL-06      | Phase 1 | Pending  |
+| VAL-07      | Phase 1 | Pending  |
+| ERR-01      | Phase 2 | Complete |
+| ERR-02      | Phase 2 | Complete |
 | ERR-03      | Phase 2 | Complete |
 | ERR-04      | Phase 2 | Complete |
-| ERR-05      | Phase 2 | Pending |
+| ERR-05      | Phase 2 | Complete |
 | ERR-06      | Phase 2 | Complete |
-| API-01      | Phase 3 | Pending |
-| API-02      | Phase 3 | Pending |
-| API-03      | Phase 3 | Pending |
-| API-04      | Phase 3 | Pending |
-| API-05      | Phase 3 | Pending |
-| API-06      | Phase 3 | Pending |
-| API-07      | Phase 3 | Pending |
-| GEN-01      | Phase 4 | Pending |
-| GEN-02      | Phase 4 | Pending |
-| GEN-03      | Phase 4 | Pending |
-| GEN-04      | Phase 4 | Pending |
-| FE-01       | Phase 4 | Pending |
-| FE-02       | Phase 4 | Pending |
-| FE-03       | Phase 4 | Pending |
-| FE-04       | Phase 4 | Pending |
-| FE-05       | Phase 4 | Pending |
-| FE-06       | Phase 4 | Pending |
+| API-01      | Phase 3 | Pending  |
+| API-02      | Phase 3 | Pending  |
+| API-03      | Phase 3 | Pending  |
+| API-04      | Phase 3 | Pending  |
+| API-05      | Phase 3 | Pending  |
+| API-06      | Phase 3 | Pending  |
+| API-07      | Phase 3 | Pending  |
+| GEN-01      | Phase 4 | Pending  |
+| GEN-02      | Phase 4 | Pending  |
+| GEN-03      | Phase 4 | Pending  |
+| GEN-04      | Phase 4 | Pending  |
+| FE-01       | Phase 4 | Pending  |
+| FE-02       | Phase 4 | Pending  |
+| FE-03       | Phase 4 | Pending  |
+| FE-04       | Phase 4 | Pending  |
+| FE-05       | Phase 4 | Pending  |
+| FE-06       | Phase 4 | Pending  |
 
 **Coverage:**
 
