@@ -87,9 +87,10 @@ beforeAll(() => {
               if (engagementsResult.status === 'rejected') {
                 log('warn', 'Engagement enrichment failed', {
                   clientId,
-                  error: engagementsResult.reason instanceof Error
-                    ? engagementsResult.reason.message
-                    : 'Unknown error',
+                  error:
+                    engagementsResult.reason instanceof Error
+                      ? engagementsResult.reason.message
+                      : 'Unknown error',
                   requestId: req.requestId,
                 });
               }
@@ -124,8 +125,8 @@ describe('GET /api/clients/:id - Error Handling', () => {
 
   describe('Happy path: Both services return success', () => {
     it('should return client data with engagementCount when both services are healthy', async () => {
-      vi.mocked(fetchJson).mockImplementation(async (_baseUrl, _path, _auth, requestId) => {
-        expect(requestId).toBe('test-request-id-123');
+      vi.mocked(fetchJson).mockImplementation((_baseUrl, _path, _auth, _requestId) => {
+        expect(_requestId).toBe('test-request-id-123');
         if (_path.includes('/engagements')) {
           return { status: 200, data: mockEngagementCount };
         }
@@ -224,7 +225,7 @@ describe('GET /api/clients/:id - Error Handling', () => {
 
   describe('Request ID propagation', () => {
     it('should pass X-Request-Id header to downstream services', async () => {
-      vi.mocked(fetchJson).mockImplementation(async (_baseUrl, _path, _auth, _requestId) => {
+      vi.mocked(fetchJson).mockImplementation((_baseUrl, _path, _auth, _requestId) => {
         expect(_requestId).toBe('test-request-id-123');
         if (_path.includes('/engagements')) {
           return { status: 200, data: mockEngagementCount };

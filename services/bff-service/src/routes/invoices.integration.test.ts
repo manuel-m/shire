@@ -6,11 +6,10 @@ import { fetchJson } from '../lib/service-client.js';
 
 // Mock service URLs
 const MOCK_CONFIG = {
-  // eslint-disable-next-line sonarjs/no-duplicate-strings, sonarjs/no-clear-text-protocols
   billingServiceUrl: 'http://billing-service:3005',
-  // eslint-disable-next-line sonarjs/no-duplicate-strings, sonarjs/no-clear-text-protocols
+
   clientServiceUrl: 'http://client-service:3002',
-  // eslint-disable-next-line sonarjs/no-duplicate-strings, sonarjs/no-clear-text-protocols
+
   engagementServiceUrl: 'http://engagement-service:3003',
   jwtSecret: 'test-secret',
   serviceName: 'bff-service',
