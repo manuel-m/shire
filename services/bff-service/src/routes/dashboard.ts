@@ -10,8 +10,8 @@ export const dashboardRouter = Router();
 dashboardRouter.use(requireAuth);
 
 // GET /api/dashboard
-dashboardRouter.get('/', (req: Request, res: Response) => {
-  void (async () => {
+dashboardRouter.get('/', async (req: Request, res: Response) => {
+  try {
     const auth = req.headers.authorization;
 
     const results = await Promise.allSettled([
@@ -62,20 +62,56 @@ dashboardRouter.get('/', (req: Request, res: Response) => {
       ),
     ]);
 
-    const extract = (r: PromiseSettledResult<{ status: number; data: { total?: number } }>) =>
-      r.status === 'fulfilled' && r.value.status === 200 ? (r.value.data.total ?? 0) : 0;
+    // Check if all services failed
+    const allFailed = results.every(
+      (r) => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.status !== 200),
+    );
+
+    if (allFailed) {
+      log('error', 'All dashboard services failed', { requestId: req.requestId });
+      res.status(502).json({
+        error: { code: 'BAD_GATEWAY', message: 'Backend service unavailable' },
+      });
+      return;
+    }
+
+    const extract = (
+      r: PromiseSettledResult<{ status: number; data: { total?: number } }>,
+      serviceName: string,
+    ) => {
+      if (r.status === 'fulfilled' && r.value.status === 200) {
+        return r.value.data.total ?? 0;
+      }
+      if (r.status === 'rejected') {
+        log('warn', `${serviceName} aggregation failed`, {
+          error: r.reason instanceof Error ? r.reason.message : 'Unknown error',
+          requestId: req.requestId,
+        });
+      }
+      return 0;
+    };
+
+    const billingServiceName = 'Billing service';
 
     const dashboard = {
-      totalClients: extract(results[0]),
-      totalEngagements: extract(results[1]),
-      totalReports: extract(results[2]),
-      totalInvoices: extract(results[3]),
-      activeEngagements: extract(results[4]),
-      draftInvoices: extract(results[5]),
-      overdueInvoices: extract(results[6]),
+      totalClients: extract(results[0], 'Client service'),
+      totalEngagements: extract(results[1], 'Engagement service'),
+      totalReports: extract(results[2], 'Report service'),
+      totalInvoices: extract(results[3], billingServiceName),
+      activeEngagements: extract(results[4], 'Engagement service'),
+      draftInvoices: extract(results[5], billingServiceName),
+      overdueInvoices: extract(results[6], billingServiceName),
     };
 
     log('info', 'Dashboard aggregated', { requestId: req.requestId });
     res.json(dashboard);
-  })();
+  } catch (err) {
+    log('error', 'Dashboard request failed', {
+      error: err instanceof Error ? err.message : 'Unknown error',
+      requestId: req.requestId,
+    });
+    res.status(502).json({
+      error: { code: 'BAD_GATEWAY', message: 'Backend service unavailable' },
+    });
+  }
 });

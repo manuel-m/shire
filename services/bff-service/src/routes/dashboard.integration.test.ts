@@ -40,6 +40,9 @@ vi.mock('@shire/shared', async (importOriginal) => {
   };
 });
 
+// Import the requestId middleware from @shire/shared for test setup
+import { requestId } from '@shire/shared';
+
 // Mock fetchJson to control service responses
 vi.mock('../lib/service-client.js', () => ({
   fetchJson: vi.fn(),
@@ -54,6 +57,7 @@ beforeEach(() => {
 function createTestApp() {
   const app = express();
   app.use(express.json());
+  app.use(requestId);
   app.use('/api/dashboard', dashboardRouter);
   return app;
 }
