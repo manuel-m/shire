@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: '2026-03-11T06:30:00.000Z'
+last_updated: '2026-03-11T00:15:00.000Z'
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 13
-  completed_plans: 5
-  percent: 38
+  completed_plans: 6
+  percent: 46
 ---
 
 # State: Tech Debt Cleanup
@@ -26,14 +26,14 @@ progress:
 ## Current Position
 
 **Phase:** 02 (BFF Error Handling) — Wave 0 complete
-**Plan:** 02-bff-error-handling-04a complete (invoice test scaffold)
+**Plan:** 02-bff-error-handling-01a complete (client test scaffold)
 **Status:** Executing
-**Progress:** [█████░░░░] 38%
+**Progress:** [██████░░░] 46%
 
 ```
-Phase: [█████░] 38%
+Phase: [██████░] 46%
 Phase 1: [████] 100% - Cross-Service Validation (complete)
-Phase 2: [███░] 15% - BFF Error Handling (Plans 00-04a complete)
+Phase 2: [█████] 30% - BFF Error Handling (Plans 00, 01a, 02a, 03a, 04a complete)
 Phase 3: [----] 0% - OpenAPI Registration
 Phase 4: [----] 0% - API Client Generation & Frontend Migration
 ```
@@ -43,6 +43,7 @@ Phase 4: [----] 0% - API Client Generation & Frontend Migration
 | Phase | Plan | Duration | Tasks | Files |
 | ----- | ---- | -------- | ----- | ----- |
 | 02-bff-error-handling | 00 | 128s | 1 | 1 |
+| 02-bff-error-handling | 01a | 15m | 1 | 2 |
 
 ## Accumulated Context
 
